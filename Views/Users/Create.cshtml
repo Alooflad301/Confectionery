@@ -1,0 +1,76 @@
+﻿@model Confectionery.Models.User
+
+@{
+    ViewData["Title"] = "Create";
+}
+<link rel="stylesheet" href="~/css/Registra.css" />
+
+<h1>Регистрация</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4 mx-auto">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Login" class="control-label">Логин</label>
+                <input asp-for="Login" class="form-control" />
+                <span asp-validation-for="Login" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Имя</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Id_Role" class="control-label">Роль</label>
+                <select asp-for="Id_Role" class="form-control" asp-items="ViewBag.Id_Role"></select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password" class="control-label">Пароль</label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="ConfirmPassword" class="control-label">Повторите пароль</label>
+                <input type="password" id="ConfirmPassword" class="form-control" />
+                <span id="confirmPasswordError" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email" class="control-label">Электронная почта</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Создать" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        const form = document.querySelector('form');
+        const passwordInput = document.querySelector('#Password');
+        const confirmPasswordInput = document.querySelector('#ConfirmPassword');
+        const confirmPasswordError = document.querySelector('#confirmPasswordError');
+
+        form.addEventListener('submit', function (e) {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                e.preventDefault();
+                confirmPasswordError.innerHTML = 'Пароли не совпадают.';
+            } else {
+                confirmPasswordError.innerHTML = '';
+            }
+        });
+    </script>
+}

@@ -1,0 +1,26 @@
+﻿body {
+    background-color: #f8f9fa; /* Светлый фон для страницы */
+}
+
+h1 {
+    color: #FF69B4; /* Розовый заголовок */
+}
+
+.form-group label {
+    font-weight: bold; /* Жирный шрифт для меток */
+    color: #FF1493; /* Темно-розовые метки */
+}
+
+.btn-primary {
+    background-color: #FFB6C1; /* Светло-розовый цвет для кнопки "Создать" */
+    border-color: #FFB6C1; /* Соответствующий цвет границ кнопки */
+}
+
+    .btn-primary:hover {
+        background-color: #FF69B4; /* Более насыщенный розовый при наведении */
+        border-color: #FF69B4; /* С соответствующей границей */
+    }
+
+.text-danger {
+    color: #dc3545; /* Красный цвет для сообщений об ошибках */
+}

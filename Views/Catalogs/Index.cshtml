@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Confectionery.Models.Catalog>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Product)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Product)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Id_Category)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id_Catalog">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id_Catalog">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id_Catalog">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

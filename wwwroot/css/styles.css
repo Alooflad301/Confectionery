@@ -1,0 +1,16 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #343a40;
+}
+
+h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.btn {
+    width: 200px;
+    margin: 10px auto; 
+}
+

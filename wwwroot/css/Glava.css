@@ -1,0 +1,19 @@
+﻿.custom-title {
+    color: #dc3545; 
+}
+
+
+.custom-login-btn {
+    background-color: #ff69b4;
+    color: white;
+}
+
+.custom-register-btn {
+    background-color: #ff1493; 
+    color: white; 
+}
+
+    .custom-login-btn:hover,
+    .custom-register-btn:hover {
+        opacity: 0.8; 
+    }
