@@ -1,0 +1,39 @@
+﻿@model Confectionery.Controllers.RegisterViewModel
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/LogReg.css">
+    <title>Регистрация</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Регистрация</h2>
+        <form asp-action="Register" method="post">
+            <div>
+                <label asp-for="Login"></label>
+                <input asp-for="Login" />
+                <span asp-validation-for="Login"></span>
+            </div>
+            <div>
+                <label asp-for="Name"></label>
+                <input asp-for="Name" />
+                <span asp-validation-for="Name"></span>
+            </div>
+            <div>
+                <label asp-for="Password"></label>
+                <input asp-for="Password" type="password" />
+                <span asp-validation-for="Password"></span>
+            </div>
+            <div>
+                <label asp-for="Email"></label>
+                <input asp-for="Email" />
+                <span asp-validation-for="Email"></span>
+            </div>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <p><small>По умолчанию назначается роль "Пользователь"</small></p>
+    </div>
+</body>
+</html>

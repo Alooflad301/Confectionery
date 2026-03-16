@@ -4,6 +4,7 @@ using Confectionery.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Confectionery.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260316101059_ASdaffsss")]
+    partial class ASdaffsss
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace Confectionery.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Basket", b =>
+            modelBuilder.Entity("Confectionery.Models.Basket", b =>
                 {
                     b.Property<int>("Id_Basket")
                         .ValueGeneratedOnAdd()
@@ -30,11 +33,11 @@ namespace Confectionery.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Basket"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("Id_User")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Total_Price")
                         .HasColumnType("decimal(18,2)");
@@ -241,7 +244,7 @@ namespace Confectionery.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Basket", b =>
+            modelBuilder.Entity("Confectionery.Models.Basket", b =>
                 {
                     b.HasOne("Confectionery.Models.User", "User")
                         .WithMany("Baskets")
@@ -254,7 +257,7 @@ namespace Confectionery.Migrations
 
             modelBuilder.Entity("Confectionery.Models.BasketCatalog", b =>
                 {
-                    b.HasOne("Basket", "Basket")
+                    b.HasOne("Confectionery.Models.Basket", "Basket")
                         .WithMany("BasketCatalogs")
                         .HasForeignKey("Id_Basket")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -312,7 +315,7 @@ namespace Confectionery.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Basket", b =>
+            modelBuilder.Entity("Confectionery.Models.Basket", b =>
                 {
                     b.Navigation("BasketCatalogs");
                 });

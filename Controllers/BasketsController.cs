@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Confectionery.Data;
-using Confectionery.Models;
 
 namespace Confectionery.Controllers
 {
@@ -57,7 +56,7 @@ namespace Confectionery.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id_Basket,Price,Total_Price,Id_User")] Basket basket)
+        public async Task<IActionResult> Create([Bind("Id_Basket,Id_User,Total_Price,CreatedDate")] Basket basket)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +90,7 @@ namespace Confectionery.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id_Basket,Price,Total_Price,Id_User")] Basket basket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id_Basket,Id_User,Total_Price,CreatedDate")] Basket basket)
         {
             if (id != basket.Id_Basket)
             {

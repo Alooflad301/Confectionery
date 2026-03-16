@@ -4,6 +4,7 @@ using Confectionery.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Confectionery.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260316070529_Volgadva")]
+    partial class Volgadva
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace Confectionery.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Basket", b =>
+            modelBuilder.Entity("Confectionery.Models.Basket", b =>
                 {
                     b.Property<int>("Id_Basket")
                         .ValueGeneratedOnAdd()
@@ -30,11 +33,11 @@ namespace Confectionery.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Basket"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("Id_User")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Total_Price")
                         .HasColumnType("decimal(18,2)");
@@ -60,9 +63,6 @@ namespace Confectionery.Migrations
                     b.Property<int>("Id_Catalog")
                         .HasColumnType("int");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
                     b.HasKey("Id_BasketCatalog");
 
                     b.HasIndex("Id_Basket");
@@ -80,34 +80,13 @@ namespace Confectionery.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Catalog"));
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<int>("Id_Ctegory")
                         .HasColumnType("int");
 
-                    b.Property<byte[]>("Photo")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("PhotoContentType")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("PhotoFileName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<long?>("PhotoSize")
-                        .HasColumnType("bigint");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Product")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id_Catalog");
 
@@ -124,14 +103,9 @@ namespace Confectionery.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Category"));
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<int>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.HasKey("Id_Category");
 
@@ -241,7 +215,7 @@ namespace Confectionery.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Basket", b =>
+            modelBuilder.Entity("Confectionery.Models.Basket", b =>
                 {
                     b.HasOne("Confectionery.Models.User", "User")
                         .WithMany("Baskets")
@@ -254,7 +228,7 @@ namespace Confectionery.Migrations
 
             modelBuilder.Entity("Confectionery.Models.BasketCatalog", b =>
                 {
-                    b.HasOne("Basket", "Basket")
+                    b.HasOne("Confectionery.Models.Basket", "Basket")
                         .WithMany("BasketCatalogs")
                         .HasForeignKey("Id_Basket")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -312,7 +286,7 @@ namespace Confectionery.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Basket", b =>
+            modelBuilder.Entity("Confectionery.Models.Basket", b =>
                 {
                     b.Navigation("BasketCatalogs");
                 });

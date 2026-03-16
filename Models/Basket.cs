@@ -1,26 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Confectionery.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Confectionery.Models
+public class Basket
 {
-    public class Basket
-    {
-        [Key]
-        public int Id_Basket { get; set; }
+    [Key]
+    public int Id_Basket { get; set; }
 
-        [Required]
-        public decimal Price { get; set; }
+    public int Id_User { get; set; }
+    [ForeignKey("Id_User")]
+    public User User { get; set; } = null!;
 
-        [Required]
+    // Итоговая сумма корзины
+    [Required]
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Total_Price { get; set; }
 
-        public decimal Total_Price {  get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public int Id_User { get; set; }
-
-        [ForeignKey("Id_User")]
-
-        public User? User { get; set; }
-
-        public ICollection<BasketCatalog>? BasketCatalogs { get; set; }
-    }
+    public ICollection<BasketCatalog> BasketCatalogs { get; set; } = new List<BasketCatalog>();
 }

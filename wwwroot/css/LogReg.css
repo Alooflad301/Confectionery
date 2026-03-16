@@ -1,0 +1,63 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    background-color: #ffeef8; /* Легкий розовый фон */
+}
+
+.container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #d5006d; /* Темно-розовый цвет */
+}
+
+label {
+    font-weight: bold;
+    color: #d5006d;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 20px;
+    border: 1px solid #d5006d;
+    border-radius: 5px;
+    transition: border 0.3s;
+}
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus,
+    select:focus {
+        border-color: #ff4081; /* Цвет при фокусе */
+    }
+
+button {
+    width: 100%;
+    background-color: #d5006d; /* Темно-розовый цвет */
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    button:hover {
+        background-color: #ff4081; /* Светлый розовый при наведении */
+    }
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%; /* Адаптивная ширина для мобильных устройств */
+    }
+}

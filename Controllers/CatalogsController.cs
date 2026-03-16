@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Confectionery.Data;
+using Confectionery.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Confectionery.Data;
-using Confectionery.Models;
+using System.Security.Claims;
 
 namespace Confectionery.Controllers
 {
@@ -19,146 +16,160 @@ namespace Confectionery.Controllers
             _context = context;
         }
 
-        // GET: Catalogs
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchString, int? categoryId, int page = 1)
         {
-            var applicationDbContext = _context.Catalog.Include(c => c.Category);
-            return View(await applicationDbContext.ToListAsync());
+            int pageSize = 12;
+            var query = _context.Catalog
+                .Include(c => c.Category)
+                .AsQueryable();
+
+            // 🔍 Поиск по названию товара
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(c => c.Product.Contains(searchString));
+                ViewBag.SearchString = searchString;
+            }
+
+            // Фильтр по категории
+            if (categoryId.HasValue)
+            {
+                query = query.Where(c => c.Id_Ctegory == categoryId.Value);
+                ViewBag.CategoryId = categoryId;
+            }
+
+            var totalItems = await query.CountAsync();
+            var catalogs = await query
+                .OrderBy(c => c.Product)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            return View(catalogs);
         }
 
-        // GET: Catalogs/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
+        public async Task<IActionResult> Details(int id)
+        {
             var catalog = await _context.Catalog
                 .Include(c => c.Category)
-                .FirstOrDefaultAsync(m => m.Id_Catalog == id);
-            if (catalog == null)
-            {
-                return NotFound();
-            }
+                .FirstOrDefaultAsync(c => c.Id_Catalog == id);
 
+            if (catalog == null) return NotFound();
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
             return View(catalog);
         }
 
-        // GET: Catalogs/Create
-        public IActionResult Create()
-        {
-            ViewData["Id_Ctegory"] = new SelectList(_context.Categories, "Id_Category", "Id_Category");
-            return View();
-        }
-
-        // POST: Catalogs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id_Catalog,Product,Id_Ctegory")] Catalog catalog)
+        public async Task<IActionResult> AddToBasket(int catalogId, int quantity = 1)
         {
-            if (ModelState.IsValid)
+            // Проверка авторизации
+            if (!User.Identity.IsAuthenticated)
             {
-                _context.Add(catalog);
+                TempData["ReturnUrl"] = $"/Catalog/Details/{catalogId}";
+                return RedirectToAction("Login", "Account");
+            }
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+
+            // Получаем корзину пользователя или создаем новую
+            var basket = await _context.Baskets
+                .Include(b => b.BasketCatalogs)
+                .ThenInclude(bc => bc.Catalog)
+                .FirstOrDefaultAsync(b => b.Id_User == userId);
+
+            if (basket == null)
+            {
+                basket = new Basket
+                {
+                    Id_User = userId,
+                    Total_Price = 0
+                };
+                _context.Baskets.Add(basket);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["Id_Ctegory"] = new SelectList(_context.Categories, "Id_Category", "Id_Category", catalog.Id_Ctegory);
-            return View(catalog);
-        }
-
-        // GET: Catalogs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
             }
 
-            var catalog = await _context.Catalog.FindAsync(id);
+            // Проверяем, есть ли уже товар в корзине
+            var basketItem = basket.BasketCatalogs
+                ?.FirstOrDefault(bc => bc.Id_Catalog == catalogId);
+
+            var catalog = await _context.Catalog.FindAsync(catalogId);
             if (catalog == null)
             {
-                return NotFound();
-            }
-            ViewData["Id_Ctegory"] = new SelectList(_context.Categories, "Id_Category", "Id_Category", catalog.Id_Ctegory);
-            return View(catalog);
-        }
-
-        // POST: Catalogs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id_Catalog,Product,Id_Ctegory")] Catalog catalog)
-        {
-            if (id != catalog.Id_Catalog)
-            {
-                return NotFound();
+                TempData["Error"] = "Товар не найден!";
+                return RedirectToAction("Index");
             }
 
-            if (ModelState.IsValid)
+            if (basketItem == null)
             {
-                try
+                // Новый товар
+                basketItem = new BasketCatalog
                 {
-                    _context.Update(catalog);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CatalogExists(catalog.Id_Catalog))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                    Id_Basket = basket.Id_Basket,
+                    Id_Catalog = catalogId
+                };
+                _context.BasketCatalogs.Add(basketItem);
             }
-            ViewData["Id_Ctegory"] = new SelectList(_context.Categories, "Id_Category", "Id_Category", catalog.Id_Ctegory);
-            return View(catalog);
-        }
-
-        // GET: Catalogs/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
+            else
             {
-                return NotFound();
-            }
-
-            var catalog = await _context.Catalog
-                .Include(c => c.Category)
-                .FirstOrDefaultAsync(m => m.Id_Catalog == id);
-            if (catalog == null)
-            {
-                return NotFound();
-            }
-
-            return View(catalog);
-        }
-
-        // POST: Catalogs/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var catalog = await _context.Catalog.FindAsync(id);
-            if (catalog != null)
-            {
-                _context.Catalog.Remove(catalog);
+                // Увеличиваем количество
+                basketItem.Quantity += quantity;
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            await RecalculateBasketTotal(basket.Id_Basket);
+
+            TempData["Success"] = $"✅ {catalog.Product} ({quantity} шт) добавлен в корзину!";
+            return RedirectToAction("Index");
         }
 
-        private bool CatalogExists(int id)
+        // Пересчет общей суммы корзины
+        private async Task RecalculateBasketTotal(int basketId)
         {
-            return _context.Catalog.Any(e => e.Id_Catalog == id);
+            var basket = await _context.Baskets
+                .Include(b => b.BasketCatalogs)
+                .ThenInclude(bc => bc.Catalog)
+                .FirstAsync(b => b.Id_Basket == basketId);
+
+            basket.Total_Price = basket.BasketCatalogs!
+                .Sum(bc => bc.Quantity * bc.Catalog.Price);
+
+            await _context.SaveChangesAsync();
         }
+        // GET: /Catalog/Basket
+        public async Task<IActionResult> Basket()
+        {
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("Login", "Account");
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            var basket = await _context.Baskets
+                .Include(b => b.BasketCatalogs)
+                .ThenInclude(bc => bc.Catalog)
+                .ThenInclude(c => c.Category)
+                .FirstOrDefaultAsync(b => b.Id_User == userId);
+
+            return View(basket?.BasketCatalogs ?? new List<BasketCatalog>());
+        }
+
+        // POST: Удалить из корзины
+        [HttpPost]
+        public async Task<IActionResult> RemoveFromBasket(int basketCatalogId)
+        {
+            var item = await _context.BasketCatalogs.FindAsync(basketCatalogId);
+            if (item != null)
+            {
+                _context.BasketCatalogs.Remove(item);
+                await _context.SaveChangesAsync();
+                await RecalculateBasketTotal(item.Id_Basket);
+            }
+            return RedirectToAction("Basket");
+        }
+
+
     }
 }

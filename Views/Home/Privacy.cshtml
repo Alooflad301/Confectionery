@@ -1,6 +1,13 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Регистрация/Авторизация";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="text-center">
+    <link rel="stylesheet" href="~/css/Glava.css">
+    <h1 class="display-4 custom-title">Добро пожаловать в кондитерскую Трали-Вали</h1>
+
+    <div class="mt-4">
+        <a class="btn custom-login-btn d-block mb-2" asp-controller="Account" asp-action="Login">Авторизация</a>
+        <a class="btn custom-register-btn d-block" asp-controller="Account" asp-action="Register">Регистрация</a>
+    </div>
+</div>

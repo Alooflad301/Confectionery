@@ -1,35 +1,33 @@
-﻿@model IEnumerable<Confectionery.Models.Category>
-
+﻿@model List<Confectionery.Models.Category>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Категории";
 }
 
-<h1>Index</h1>
+<div class="categories-page">
+    <div class="page-header">
+        <h1>Категории</h1>
+        <a asp-action="Index" asp-controller="Catalog" class="btn btn-primary">К каталогу</a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id_Category">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id_Category">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id_Category">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="categories-grid">
+        @foreach (var category in Model)
+        {
+            <div class="category-card">
+                <div class="category-info">
+                    <h3>@category.Name</h3>
+                    <p>@category.ProductsCount товаров</p>
+                    @if (!string.IsNullOrEmpty(category.Description))
+                    {
+                        <p class="description">@category.Description</p>
+                    }
+                    <div class="category-actions">
+                        <a asp-action="Details" asp-route-id="@category.Id_Category"
+                           class="btn btn-outline-primary">Подробнее</a>
+                        <a asp-controller="Catalog" asp-action="Index" asp-route-categoryId="@category.Id_Category"
+                           class="btn btn-primary">В каталог</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

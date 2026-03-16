@@ -1,0 +1,34 @@
+﻿@model Confectionery.Controllers.LoginViewModel
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/LogReg.css"> <!-- Подключаем ваш CSS файл -->
+    <title>Вход</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Вход</h2>
+
+<form asp-action="Login" method="post">
+    <div>
+        <label asp-for="Login"></label>
+        <input asp-for="Login" />
+        <span asp-validation-for="Login"></span>
+    </div>
+    <div>
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+    <div>
+        <input type="checkbox" asp-for="RememberMe" />
+        <label asp-for="RememberMe">Запомнить меня</label>
+    </div>
+    <button type="submit">Войти</button>
+</form>
+    </div>
+</body>
+</html>

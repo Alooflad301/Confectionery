@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Confectionery.Models.Basket>
+﻿@model IEnumerable<Basket>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,13 +13,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                @Html.DisplayNameFor(model => model.User)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Total_Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.User)
+                @Html.DisplayNameFor(model => model.CreatedDate)
             </th>
             <th></th>
         </tr>
@@ -28,13 +28,13 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
+                @Html.DisplayFor(modelItem => item.User.Email)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Total_Price)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.User.Email)
+                @Html.DisplayFor(modelItem => item.CreatedDate)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id_Basket">Edit</a> |

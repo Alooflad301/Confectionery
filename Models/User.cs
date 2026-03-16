@@ -10,13 +10,13 @@ namespace Confectionery.Models
 
         [Required]
         [StringLength(50)]
-        public string? Login { get; set; }
+        public string Login { get; set; }
 
         [Required]
         [StringLength(50)]
         public string? Name { get; set; }
 
-        public int Id_Role { get; set; }
+        public int Id_Role { get; set; } = 2;
 
         [ForeignKey("Id_Role")]
         public Role? Role { get; set; }
@@ -29,6 +29,9 @@ namespace Confectionery.Models
         [EmailAddress]
         [StringLength(50)]
         public string? Email { get; set; }
+
+        [NotMapped]
+        public bool RememberMe { get; set; }
 
         public ICollection<Order>? Orders { get; set; }
         public ICollection<Basket>? Baskets { get; set; }

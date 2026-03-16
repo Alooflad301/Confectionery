@@ -7,14 +7,17 @@ namespace Confectionery.Models
     {
         [Key]
         public int Id_BasketCatalog { get; set; }
-        public int Id_Basket {  get; set; }
 
+        public int Id_Basket { get; set; }
         [ForeignKey("Id_Basket")]
-        public Basket? Basket { get; set; }
+        public Basket Basket { get; set; } = null!;
 
         public int Id_Catalog { get; set; }
-
         [ForeignKey("Id_Catalog")]
-        public Catalog? Catalog { get; set; } 
+        public Catalog Catalog { get; set; } = null!;
+
+        [Required]
+        public int Quantity { get; set; } = 1;
     }
+
 }

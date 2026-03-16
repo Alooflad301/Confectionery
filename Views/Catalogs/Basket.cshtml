@@ -1,0 +1,52 @@
+﻿@model List<Confectionery.Models.BasketCatalog>
+@{
+    ViewData["Title"] = "Корзина";
+}
+
+<h2>🛒 Ваша корзина</h2>
+
+@if (!Model.Any())
+{
+    <div class="empty-cart">
+        <i class="fas fa-shopping-cart fa-3x text-muted"></i>
+        <h4>Корзина пуста</h4>
+        <a asp-action="Index" class="btn btn-primary">Продолжить покупки</a>
+    </div>
+}
+else
+{
+    <div class="cart-items">
+        @foreach (var item in Model)
+        {
+            <div class="cart-item row align-items-center mb-3 p-3 border rounded">
+                <div class="col-md-2">
+                    @if (item.Catalog.HasPhoto)
+                    {
+                        <img src="@item.Catalog.PhotoBase64" class="img-fluid" style="max-height:80px" />
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h5>@item.Catalog.Product</h5>
+                    <small>@item.Catalog.Category?.Name</small>
+                </div>
+                <div class="col-md-2 text-center">
+                    <span class="qty">@item.Quantity шт</span><br>
+                    <span class="price">@item.Catalog.Price.ToString("C")</span>
+                </div>
+                <div class="col-md-2 text-end">
+                    <strong>@((item.Quantity * item.Catalog.Price).ToString("C"))</strong><br>
+                    <form asp-action="RemoveFromBasket" asp-route-basketCatalogId="@item.Id_BasketCatalog" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить?')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="cart-total text-end mt-4">
+        <h4>Итого: @Model.Sum(i => i.Quantity * i.Catalog.Price).ToString("C")</h4>
+        <a asp-action="Checkout" class="btn btn-success btn-lg">Оформить заказ</a>
+    </div>
+}
