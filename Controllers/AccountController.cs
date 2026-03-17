@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Confectionery.Data;
+using Confectionery.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using Confectionery.Data;
-using Confectionery.Models;
 
 namespace Confectionery.Controllers
 {
@@ -72,7 +73,7 @@ namespace Confectionery.Controllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Catalogs");
         }
 
         [HttpGet]
@@ -142,6 +143,75 @@ namespace Confectionery.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.Baskets)
+                .ThenInclude(b => b.BasketCatalogs)
+                .ThenInclude(bc => bc.Catalog)
+                .FirstOrDefaultAsync(u => u.Id_User == userId);
+
+            if (user == null) return NotFound();
+
+            // ✅ СТАТИСТИКА
+            ViewBag.OrderCount = await _context.Orders.CountAsync(o => o.Id_User == userId);
+            ViewBag.BasketItems = user.Baskets?.SelectMany(b => b.BasketCatalogs).Sum(bc => bc.Quantity) ?? 0;
+            ViewBag.BasketTotal = user.Baskets?.SelectMany(b => b.BasketCatalogs)
+                .Sum(bc => bc.Quantity * bc.Catalog.Price) ?? 0;
+
+            return View(user);
+        }
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Orders()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            var orders = await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.StatusOrder)
+                .Include(o => o.OrderCatalogs)
+                .ThenInclude(oc => oc.Catalog)
+                .ThenInclude(c => c.Category)
+                .Where(o => o.Id_User == userId)
+                .OrderByDescending(o => o.Date)
+                .ToListAsync();
+
+            return View(orders);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> OrderDetails(int id)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            var order = await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.StatusOrder)
+                .Include(o => o.OrderCatalogs)!
+                .ThenInclude(oc => oc.Catalog)
+                .ThenInclude(c => c.Category)
+                .FirstOrDefaultAsync(o => o.Id_Order == id && o.Id_User == userId);
+
+            if (order == null) return NotFound();
+            return View(order);
+        }
+
+
+
+
     }
 
     // ViewModel для формы логина
@@ -174,4 +244,5 @@ namespace Confectionery.Controllers
         [StringLength(50)]
         public string? Email { get; set; }
     }
+
 }

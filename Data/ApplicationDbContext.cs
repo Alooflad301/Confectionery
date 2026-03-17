@@ -14,5 +14,6 @@ namespace Confectionery.Data
         public DbSet<Catalog> Catalog { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<BasketCatalog> BasketCatalogs { get; set; }
+        public DbSet<OrderCatalog> OrderCatalogs { get; set; }
     }
 }

@@ -1,0 +1,55 @@
+﻿@model List<Confectionery.Models.Order>
+@{
+    ViewData["Title"] = "Заказы";
+}
+
+<div class="container-fluid py-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <h2>📋 Заказы (@Model.Count())</h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Клиент</th>
+                    <th>Дата</th>
+                    <th>Статус</th>
+                    <th>Сумма</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>#@order.Id_Order</td>
+                        <td>@order.User?.Name</td>
+                        <td>@order.Date.ToString("dd.MM HH:mm")</td>
+                        <td>
+                            <span class="badge status-badge status-@order.StatusOrder?.Name?.ToLower()">
+                                @order.StatusOrder?.Name
+                            </span>
+                        </td>
+                        <td><strong>@order.Price.ToString("C")</strong></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a asp-action="EditOrder" asp-route-id="@order.Id_Order"
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

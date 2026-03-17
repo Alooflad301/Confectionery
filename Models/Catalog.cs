@@ -59,5 +59,6 @@ namespace Confectionery.Models
         {
             Price = 0;
         }
+        public ICollection<OrderCatalog> OrderCatalogs { get; set; }
     }
 }

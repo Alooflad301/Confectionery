@@ -1,7 +1,235 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<Confectionery.Models.Catalog>
+@{
+    ViewData["Title"] = "Главная - Кондитерская";
 }
 
-<div class="text-center">
+<div class="confectionery-home">
+    <!-- 🎨 ГЕРОЙ СЕКЦИЯ -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="container position-relative">
+            <div class="row align-items-center min-vh-100">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="hero-title display-3 fw-bold mb-4 animate__animated animate__fadeInUp">
+                            🍰 Сладкое искусство
+                        </h1>
+                        <p class="hero-subtitle lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                            Ручная работа · Свежие ингредиенты · Доставка по СПб
+                        </p>
+                        <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
+                            <a asp-controller="Catalogs" asp-action="Index" class="btn btn-primary btn-lg hero-btn me-3">
+                                <i class="fas fa-cookie-bite me-2"></i>В каталог
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image animate__animated animate__zoomIn animate__delay-1s">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIGQ9Ik0zMjAgMTA0QzMyMCA4MCAzMDQgNTYgMjgwIDU2SDIzMkwyMDAgMTI4VjI1NkgxOTZDMjAzLjItMjU2IDIwOC0yNTYgMjEyLTI1NlYxOTJoLTY0VjE2MEgxOTZDMjAyLjgtMTYwIDIwOC0xNjAgMjE0LTE2MFYyMjRIMTUyVjIwMEgxNDhDMjE1LjgtMjAwIDIyMC0yMDAgMjI0LTIwMFYyNDBIMTUyVjIzNkgxNDhDMjE1LjgtMjM2IDIyMC0yMzYgMjI0LTIzNlYyNzZIMTUyVjI1MkgxNDhDMjE1LjgtMjUyIDIyMC0yNTIgMjI0LTI1MlYyOTZIMTUyVjI3MkExMiAxMiAwIDAgMSAxNjAgMjg4SDE5MkEyIDEgMCAwIDEgMTk0IDI4OEMxOTcuOCAyODggMjA0IDI4OCAyMDggMjg4VjI5MkEyIDEgMCAwIDEgMjA2IDI5NEgxOTJBMiAyIDAgMCAxIDE5MCAyOTZWMzIwaDY0VjMxMkgyMDBBMiAyIDAgMCAxIDE5OCAzMTRIMTUyVjMxMkE0IDQgMCAwIDEgMTQ4IDMxNkgyNDJBMCAwIDAgMSAxIDI1MiAzMjBIMjgwQTEyIDEyIDAgMCAxIDI5MiAzMDhWMjg4SDE5MkEyIDEgMCAwIDEgMTkwIDI4NkwxOTIgMjg4VjI4NFYxOTJIMjgwQTEyIDEyIDAgMCAxIDMyMCAxODBWMTUySDI4MEMzMDQgMTUyIDMyMCAxMzYgMzIwIDEyMFYyMDhIMjgwQS0xMiAtMTIgMCAwIDEgMjY4IDIyMFYyMzZIMjgwQTEyIDEyIDAgMCAxIDMyMCAyMjRWMjA4SDMyMFoiIGZpbGw9IiNEMzUyQjIiLz4KPC9zdmc+Cg=="
+                             alt="Торт" class="img-fluid rounded-5 shadow-lg cake-hero" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- 🔥 ХИТЫ ПРОДАЖ -->
+    <section class="hits-section py-5 bg-cream">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title display-5 fw-bold mb-3">
+                    🔥 Хиты продаж
+                </h2>
+                <p class="lead text-muted">Самые популярные десерты недели</p>
+            </div>
+            <div class="row g-4">
+                @if (Model != null && Model.Any())
+                {
+                    @for (int i = 0; i < Math.Min(6, Model.Count); i++)
+                    {
+                        var item = Model[i];
+                        <div class="col-lg-4 col-md-6">
+                            <div class="hit-card card h-100 shadow-lg border-0 overflow-hidden position-relative">
+                                <div class="hit-badge">
+                                    <span class="badge bg-danger fs-6 fw-bold">#@(i + 1)</span>
+                                </div>
+                                @if (item.HasPhoto)
+                                {
+                                    <img src="@item.PhotoBase64" class="card-img-top hit-img" alt="@item.Product" />
+                                }
+                                else
+                                {
+                                    <div class="no-image-placeholder d-flex align-items-center justify-content-center bg-pastel-pink">
+                                        <i class="fas fa-cookie-bite fa-3x text-white"></i>
+                                    </div>
+                                }
+                                <div class="card-body p-4">
+                                    <h5 class="card-title fw-bold mb-2">@item.Product</h5>
+                                    <div class="category mb-3">
+                                        <small class="badge bg-light text-dark">@item.Category?.Name</small>
+                                    </div>
+                                    <div class="price-tag h3 text-danger fw-bold mb-3">@item.Price.ToString("C")</div>
+                                    <a asp-controller="Catalogs" asp-action="Details" asp-route-id="@item.Id_Catalog"
+                                       class="btn btn-primary w-100 rounded-pill shadow-sm">
+                                        <i class="fas fa-shopping-cart me-2"></i>В корзину
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- 🎂 КАТЕГОРИИ -->
+    <section class="categories-section py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title display-5 fw-bold mb-3">🍭 Категории</h2>
+                <p class="lead text-muted">Выберите любимые десерты</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <a href="#" class="category-card text-decoration-none">
+                        <div class="category-icon bg-tort rounded-circle d-flex align-items-center justify-content-center mb-3">
+                            <i class="fas fa-birthday-cake fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Торты</h4>
+                        <p class="text-muted">На день рождения, свадьбу, корпоратив</p>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a href="#" class="category-card text-decoration-none">
+                        <div class="category-icon bg-pirozhnoe rounded-circle d-flex align-items-center justify-content-center mb-3">
+                            <i class="fas fa-gem fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Пирожные</h4>
+                        <p class="text-muted">Эклер, макаронс, чизкейк</p>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a href="#" class="category-card text-decoration-none">
+                        <div class="category-icon bg-pechene rounded-circle d-flex align-items-center justify-content-center mb-3">
+                            <i class="fas fa-cookie fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Печенье</h4>
+                        <p class="text-muted">Классика и авторское</p>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a href="#" class="category-card text-decoration-none">
+                        <div class="category-icon bg-shokolad rounded-circle d-flex align-items-center justify-content-center mb-3">
+                            <i class="fas fa-candy-cane fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Шоколад</h4>
+                        <p class="text-muted">Бельгийский, ручной работы</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 💎 ПРЕИМУЩЕСТВА -->
+    <section class="advantages-section py-5 bg-pastel-cream">
+        <div class="container">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-4">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjIwMCIgcj0iMjAwIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIGQ9Ik0yMDAgMTUwQzE5Ny44IDE1MCAxOTYgMTUxLjggMTk2IDE1NFYxNzBDMTk2IDE3Mi4yIDE5Ny44IDE3NCAyMDAgMTc0SDIwNFYxNTRDMjA0IDE1MS44IDIwMi4yIDE1MCAyMDAgMTUwWiIgZmlsbD0iIzI4QTRDMSIvPgo8L3N2Zz4K"
+                         alt="Десерт" class="img-fluid rounded-4 shadow-lg advantage-img" />
+                </div>
+                <div class="col-lg-8">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="advantage-item">
+                                <div class="advantage-icon bg-primary rounded-circle">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                                <h5 class="fw-bold mt-3">Свежие продукты</h5>
+                                <p class="text-muted">Только натуральные ингредиенты от проверенных поставщиков</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="advantage-item">
+                                <div class="advantage-icon bg-success rounded-circle">
+                                    <i class="fas fa-shipping-fast"></i>
+                                </div>
+                                <h5 class="fw-bold mt-3">Быстрая доставка</h5>
+                                <p class="text-muted">По СПб от 1 часа, самовывоз бесплатно</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="advantage-item">
+                                <div class="advantage-icon bg-warning rounded-circle">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <h5 class="fw-bold mt-3">Гарантия вкуса</h5>
+                                <p class="text-muted">Если не понравится - вернем деньги</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="advantage-item">
+                                <div class="advantage-icon bg-info rounded-circle">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h5 class="fw-bold mt-3">5000+ клиентов</h5>
+                                <p class="text-muted">Доверие тысяч сладкоежек</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 📞 КОНТАКТЫ -->
+    <section class="contacts-section py-5 bg-gradient-pink">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="display-5 fw-bold mb-4 text-white">Готовы к сладкому заказу?</h2>
+                    <p class="lead text-white mb-4 opacity-90">Звоните или пишите - сделаем незабываемый десерт!</p>
+                    <div class="contact-info">
+                        <div class="contact-item mb-3">
+                            <i class="fas fa-phone text-primary fa-2x me-3"></i>
+                            <div>
+                                <div class="fw-bold text-white">+7 (999) 123-45-67</div>
+                                <small class="text-white-50">Ежедневно 9:00-22:00</small>
+                            </div>
+                        </div>
+                        <div class="contact-item mb-3">
+                            <i class="fas fa-envelope text-primary fa-2x me-3"></i>
+                            <div>
+                                <div class="fw-bold text-white">hello@sweetshop.ru</div>
+                                <small class="text-white-50">Ответим за 15 минут</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="contact-form-card card shadow-lg border-0">
+                        <div class="card-body p-5">
+                            <h4 class="fw-bold mb-4">Быстрый заказ</h4>
+                            <form>
+                                <div class="mb-4">
+                                    <input type="text" class="form-control rounded-pill px-4" placeholder="Ваш телефон">
+                                </div>
+                                <div class="mb-4">
+                                    <textarea class="form-control rounded-5 px-4 py-3" rows="4" placeholder="Что хотите заказать?"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold">
+                                    <i class="fas fa-paper-plane me-2"></i>Отправить заявку
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+}

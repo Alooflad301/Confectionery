@@ -1,0 +1,87 @@
+﻿@if (User.Identity.IsAuthenticated)
+{
+    <li class="nav-item dropdown ms-3">
+        <div class="dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark p-2 rounded-pill"
+               href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+               style="transition: all 0.3s ease;">
+                <i class="fas fa-user-circle fa-lg text-primary"></i>
+                <span class="d-none d-md-inline fw-semibold">@User.Identity.Name</span>
+                <i class="fas fa-chevron-down ms-1 small opacity-75"></i>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-2"
+                style="border-radius: 20px; min-width: 240px; backdrop-filter: blur(10px);">
+
+                <!-- ✅ ПРОФИЛЬ -->
+                <li>
+                    <a class="dropdown-item py-3 px-4 rounded-3 mb-1"
+                       asp-controller="Account" asp-action="Profile"
+                       style="transition: all 0.3s ease;">
+                        <i class="fas fa-user me-3 text-primary"></i>
+                        <span>Профиль</span>
+                    </a>
+                </li>
+
+                <!-- ✅ ЗАКАЗЫ -->
+                <li>
+                    <a class="dropdown-item py-3 px-4 rounded-3 mb-1"
+                       asp-controller="Account" asp-action="Orders"
+                       style="transition: all 0.3s ease;">
+                        <i class="fas fa-shopping-bag me-3 text-success"></i>
+                        <span>Заказы</span>
+                    </a>
+                </li>
+
+                <!-- ✅ АДМИН ПАНЕЛЬ (только для Администратора) -->
+                @if (User.IsInRole("Администратор"))
+                {
+                    <li>
+                        <a class="dropdown-item py-3 px-4 rounded-3 mb-1 bg-warning bg-opacity-10 border-start border-warning border-3"
+                           asp-area="Admin" asp-controller="Admin" asp-action="Index"
+                           style="transition: all 0.3s ease;">
+                            <i class="fas fa-cogs me-3 text-warning"></i>
+                            <span class="fw-bold">👨‍💼 Админ панель</span>
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider my-1 border-warning opacity-50"></li>
+                }
+
+                <!-- ✅ РАЗДЕЛИТЕЛЬ -->
+                @if (!User.IsInRole("Администратор"))
+                {
+                    <li><hr class="dropdown-divider my-2"></li>
+                }
+
+                <!-- ✅ ВЫХОД -->
+                <li>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="px-2 logout-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="dropdown-item py-3 px-4 rounded-3 w-100 text-start border-0 bg-transparent logout-btn"
+                                style="transition: all 0.3s ease;">
+                            <i class="fas fa-sign-out-alt me-3 text-danger"></i>
+                            <span>Выйти из аккаунта</span>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </li>
+}
+else
+{
+    <!-- ❌ НЕ АВТОРИЗОВАН -->
+    <div class="auth-buttons d-flex gap-2 ms-3">
+        <a asp-controller="Account" asp-action="Login"
+           class="btn btn-outline-primary btn-sm px-3 py-2 fw-semibold rounded-pill shadow-sm"
+           style="border-color: #d5006d; color: #d5006d;">
+            <i class="fas fa-sign-in-alt me-1"></i>
+            Вход
+        </a>
+        <a asp-controller="Account" asp-action="Register"
+           class="btn btn-primary btn-sm px-3 py-2 fw-semibold rounded-pill shadow-sm">
+            <i class="fas fa-user-plus me-1"></i>
+            Регистрация
+        </a>
+    </div>
+}

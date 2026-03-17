@@ -1,0 +1,58 @@
+﻿.admin-body {
+    background: #f4f6f9;
+}
+
+.admin-dashboard .card {
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+
+    .admin-dashboard .card:hover {
+        transform: translateY(-5px);
+    }
+
+.border-left-primary {
+    border-left: 0.25rem solid #007bff !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #28a745 !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #17a2b8 !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #ffc107 !important;
+}
+
+.admin-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+    .admin-link:hover {
+        color: white !important;
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+    }
+
+.admin-section {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.btn-group .btn {
+    border-radius: 10px;
+    margin: 0 2px;
+}

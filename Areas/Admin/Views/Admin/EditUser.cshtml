@@ -1,0 +1,19 @@
+﻿@model Confectionery.Models.User
+<h3>Редактировать пользователя</h3>
+<form asp-action="EditUser" method="post">
+    <input asp-for="Id_User" type="hidden" />
+    <div class="mb-3">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Login"></label>
+        <input asp-for="Login" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="Users" class="btn btn-secondary">Отмена</a>
+</form>

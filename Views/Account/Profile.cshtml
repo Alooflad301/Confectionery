@@ -1,0 +1,77 @@
+﻿@model Confectionery.Models.User
+@{
+    ViewData["Title"] = "Профиль";
+}
+
+<div class="profile-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="profile-card shadow-lg">
+                <!-- АВАТАР -->
+                <div class="profile-header text-center p-5 position-relative">
+                    <div class="avatar-container">
+                        <i class="fas fa-user-circle fa-5x text-white"></i>
+                    </div>
+                    <h2 class="mb-1">@Model.Name</h2>
+                    <div class="badge bg-primary">@Model.Role?.Name</div>
+                </div>
+
+                <!-- ИНФОРМАЦИЯ -->
+                <div class="profile-info p-5">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="info-item">
+                                <i class="fas fa-user icon"></i>
+                                <div>
+                                    <label>Логин</label>
+                                    <span>@Model.Login</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="info-item">
+                                <i class="fas fa-envelope icon"></i>
+                                <div>
+                                    <label>Email</label>
+                                    <span>@Model.Email</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- СТАТИСТИКА -->
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="stat-card text-center">
+                                <div class="stat-number">@ViewBag.OrderCount</div>
+                                <div class="stat-label">Заказов</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card text-center">
+                                <div class="stat-number">@ViewBag.BasketItems</div>
+                                <div class="stat-label">В корзине</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card text-center">
+                                <div class="stat-number">@ViewBag.BasketTotal.ToString("C")</div>
+                                <div class="stat-label">Сумма корзины</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- КНОПКИ -->
+                <div class="profile-actions p-4 border-top text-center">
+                    <form asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-lg px-5">
+                            <i class="fas fa-sign-out-alt me-2"></i>Выйти из аккаунта
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

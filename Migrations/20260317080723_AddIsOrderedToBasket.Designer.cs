@@ -4,6 +4,7 @@ using Confectionery.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Confectionery.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260317080723_AddIsOrderedToBasket")]
+    partial class AddIsOrderedToBasket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,9 +36,6 @@ namespace Confectionery.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("Id_Order")
-                        .HasColumnType("int");
-
                     b.Property<int>("Id_User")
                         .HasColumnType("int");
 
@@ -46,8 +46,6 @@ namespace Confectionery.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id_Basket");
-
-                    b.HasIndex("Id_Order");
 
                     b.HasIndex("Id_User");
 
@@ -175,32 +173,6 @@ namespace Confectionery.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Confectionery.Models.OrderCatalog", b =>
-                {
-                    b.Property<int>("Id_OrderCatalog")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_OrderCatalog"));
-
-                    b.Property<int>("Id_Catalog")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Id_Order")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id_OrderCatalog");
-
-                    b.HasIndex("Id_Catalog");
-
-                    b.HasIndex("Id_Order");
-
-                    b.ToTable("OrderCatalogs");
-                });
-
             modelBuilder.Entity("Confectionery.Models.Role", b =>
                 {
                     b.Property<int>("Id_Role")
@@ -277,17 +249,11 @@ namespace Confectionery.Migrations
 
             modelBuilder.Entity("Basket", b =>
                 {
-                    b.HasOne("Confectionery.Models.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("Id_Order");
-
                     b.HasOne("Confectionery.Models.User", "User")
                         .WithMany("Baskets")
                         .HasForeignKey("Id_User")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Order");
 
                     b.Navigation("User");
                 });
@@ -339,25 +305,6 @@ namespace Confectionery.Migrations
                     b.Navigation("StatusOrder");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Confectionery.Models.OrderCatalog", b =>
-                {
-                    b.HasOne("Confectionery.Models.Catalog", "Catalog")
-                        .WithMany()
-                        .HasForeignKey("Id_Catalog")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Confectionery.Models.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("Id_Order")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Catalog");
-
-                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Confectionery.Models.User", b =>

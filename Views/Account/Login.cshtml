@@ -5,30 +5,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="~/css/LogReg.css"> <!-- Подключаем ваш CSS файл -->
+    <link rel="stylesheet" href="~/css/LogReg.css">
     <title>Вход</title>
 </head>
 <body>
     <div class="container">
-        <h2>Вход</h2>
+        <div class="logo mb-4">
+            <i class="fas fa-cookie-bite fa-3x"></i>
+        </div>
 
-<form asp-action="Login" method="post">
-    <div>
-        <label asp-for="Login"></label>
-        <input asp-for="Login" />
-        <span asp-validation-for="Login"></span>
-    </div>
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-    <div>
-        <input type="checkbox" asp-for="RememberMe" />
-        <label asp-for="RememberMe">Запомнить меня</label>
-    </div>
-    <button type="submit">Войти</button>
-</form>
+        <h2>Вход в кондитерскую</h2>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                Проверьте введенные данные
+            </div>
+        }
+
+        <form asp-action="Login" method="post">
+            <div>
+                <label asp-for="Login"></label>
+                <input asp-for="Login" class="form-control" />
+                <span asp-validation-for="Login" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="Password"></label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="checkbox-container">
+                <input type="checkbox" asp-for="RememberMe" id="rememberMe" />
+                <label for="rememberMe">Запомнить меня</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3">Войти</button>
+        </form>
+
+        <!-- ✅ НОВАЯ КНОПКА РЕГИСТРАЦИИ -->
+        <div class="register-link">
+            <p>
+                Нет аккаунта?
+                <a asp-controller="Account" asp-action="Register" class="register-btn">
+                    Зарегистрироваться
+                </a>
+            </p>
+        </div>
     </div>
 </body>
 </html>

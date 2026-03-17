@@ -5,11 +5,11 @@
     int totalPages = ViewBag.TotalPages as int? ?? 1;
 }
 
-    <div class="catalog-page">
+<div class="catalog-page">
+    <!-- 🔍 Поиск -->
     <div class="catalog-header">
-        <h1>Каталог товаров</h1>
+        <h1>🧁 Каталог кондитерских изделий</h1>
 
-        <!-- 🔍 ПОИСКОВАЯ СТРОКА -->
         <form asp-action="Index" method="get" class="search-form">
             <div class="input-group">
                 <input type="text" name="searchString" class="form-control search-input"
@@ -19,86 +19,110 @@
                     <i class="fas fa-search"></i>
                 </button>
             </div>
-            @if (ViewBag.CategoryId != null)
-            {
-                <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
-            }
         </form>
-
-        <!-- Фильтр по категориям -->
-        <div class="categories-filter mt-3">
-            <a asp-action="Index" class="btn btn-outline-primary @(ViewBag.CategoryId == null ? "active" : "")">
-                Все
-            </a>
-            @foreach (var cat in ViewBag.Categories as List<Confectionery.Models.Category>)
-            {
-                <a asp-action="Index" asp-route-categoryId="@cat.Id_Category"
-                   asp-route-searchString="@ViewBag.SearchString"
-                   class="btn btn-outline-primary @(ViewBag.CategoryId?.ToString() == cat.Id_Category.ToString() ? "active" : "")">
-                    @cat.Name (@cat.ProductsCount)
-                </a>
-            }
-        </div>
     </div>
 
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
+    <!-- 🛠️ НОВЫЙ БЛОК ФИЛЬТРОВ -->
+    <div class="filters-panel">
+        <form asp-action="Index" method="get" class="filters-form">
+            <!-- Скрытые поля для сохранения поиска -->
+            <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
 
-        <!-- Сетка товаров 4 в ряд -->
-        <div class="products-grid">
-            @foreach (var item in Model)
-            {
-                <div class="product-card">
-                    <div class="product-image-container">
-                        @if (item.Photo != null)
-                        {
-                            <img src="data:@item.PhotoContentType;base64,@Convert.ToBase64String(item.Photo)"
-                                 alt="@item.Product" loading="lazy" />
-                        }
-                        else
-                        {
-                            <img src="~/images/no-image.png" alt="Нет изображения" loading="lazy" />
-                        }
+            <div class="filter-group">
+                <label>🏷️ Категория:</label>
+                <select name="categoryId" class="form-select">
+                    <option value="">Все категории</option>
+                    @foreach (var cat in ViewBag.Categories as List<Confectionery.Models.Category>)
+                    {
+                        <option value="@cat.Id_Category"
+                                selected="@(ViewBag.CategoryId?.ToString() == cat.Id_Category.ToString())">
+                            @cat.Name (@cat.ProductsCount)
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group price-filter">
+                <label>💰 Цена:</label>
+                <div class="price-inputs">
+                    <input type="number" name="minPrice" class="form-control"
+                           placeholder="от" value="@ViewBag.MinPrice" min="0" step="10">
+                    <span>-</span>
+                    <input type="number" name="maxPrice" class="form-control"
+                           placeholder="до" value="@ViewBag.MaxPrice" min="0" step="10">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-filter"></i> Применить
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Очистить</a>
+        </form>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <!-- 💰 ЦЕНЫ В КАРТОЧКАХ ТОВАРОВ -->
+    <div class="products-grid">
+        @foreach (var item in Model)
+        {
+            <div class="product-card">
+                <div class="product-image-container">
+                    @if (item.HasPhoto)
+                    {
+                        <img src="@item.PhotoBase64" alt="@item.Product" loading="lazy" />
+                    }
+                    else
+                    {
+                        <img src="~/images/no-image.png" alt="Нет изображения" loading="lazy" />
+                    }
+                </div>
+
+                <div class="product-info">
+                    <h3>@item.Product</h3>
+                    <div class="category">@item.Category?.Name</div>
+
+                    <!-- ✅ НОВАЯ ЦЕНА В КАРТОЧКЕ -->
+                    <div class="price-tag">
+                        <span class="current-price">@item.Price.ToString("C")</span>
                     </div>
 
-                    <div class="product-info">
-                        <h3>@item.Product</h3>
-                        <div class="category">@item.Category?.Name</div>
-                        <p class="description">@item.Description</p>
+                    <p class="description">@item.Description</p>
 
-                        <div class="product-actions">
-                            <a asp-action="Details" asp-route-id="@item.Id_Catalog" class="btn btn-outline-primary">
-                                Подробнее
-                            </a>
-                            <form asp-action="AddToBasket" asp-route-catalogId="@item.Id_Catalog" method="post" class="add-to-cart-form">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-cart-plus"></i> В корзину
-                                </button>
-                            </form>
-                        </div>
+                    <div class="product-actions">
+                        <a asp-action="Details" asp-route-id="@item.Id_Catalog" class="btn btn-outline-primary">
+                            Подробнее
+                        </a>
+                        <form asp-action="AddToBasket" asp-route-catalogId="@item.Id_Catalog" method="post" class="add-to-cart-form">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-cart-plus"></i> В корзину
+                            </button>
+                        </form>
                     </div>
                 </div>
-            }
-        </div>
-
-        <!-- Пагинация -->
-        @if (totalPages > 1)
-        {
-            <nav aria-label="Пагинация">
-                <ul class="pagination justify-content-center">
-                    @for (int i = 1; i <= totalPages; i++)
-                    {
-                        <li class="page-item @(i == currentPage ? "active" : "")">
-                            <a class="page-link" asp-action="Index" asp-route-page="@i"
-                               asp-route-categoryId="@ViewBag.CategoryId">@i</a>
-                        </li>
-                    }
-                </ul>
-            </nav>
+            </div>
         }
     </div>
+
+    <!-- Пагинация -->
+    @if (totalPages > 1)
+    {
+        <nav class="pagination-nav">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i"
+                           asp-route-searchString="@ViewBag.SearchString"
+                           asp-route-categoryId="@ViewBag.CategoryId"
+                           asp-route-minPrice="@ViewBag.MinPrice"
+                           asp-route-maxPrice="@ViewBag.MaxPrice">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>

@@ -25,7 +25,7 @@ namespace Confectionery.Models
         [Required]
         public decimal Price { get; set; }
 
-
+        public ICollection<OrderCatalog> OrderCatalogs { get; set; }
 
     }
 }

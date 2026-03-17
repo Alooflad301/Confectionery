@@ -1,0 +1,59 @@
+﻿@model List<Confectionery.Models.Catalog>
+@{
+    ViewData["Title"] = "Товары";
+}
+
+<div class="container-fluid py-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🍪 Товары (@Model.Count())</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Добавить товар
+        </a>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var product in Model)
+        {
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm">
+                    @if (product.HasPhoto)
+                    {
+                        <img src="@product.PhotoBase64" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="no-image" style="height: 200px; background: #f8f9fa;">
+                            <i class="fas fa-cookie-bite fa-3x text-muted"></i>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Product</h5>
+                        <p class="card-text text-success fw-bold fs-4">@product.Price.ToString("C")</p>
+                        <p class="text-muted small">@product.Category?.Name</p>
+                        <div class="btn-group w-100" role="group">
+                            <a asp-action="EditProduct" asp-route-id="@product.Id_Catalog"
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit"></i> Изменить
+                            </a>
+                            <form asp-action="DeleteProduct" asp-route-id="@product.Id_Catalog"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('Удалить @product.Product?')">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Удалить
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

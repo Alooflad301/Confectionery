@@ -3,50 +3,264 @@
     ViewData["Title"] = "Корзина";
 }
 
-<h2>🛒 Ваша корзина</h2>
-
-@if (!Model.Any())
-{
-    <div class="empty-cart">
-        <i class="fas fa-shopping-cart fa-3x text-muted"></i>
-        <h4>Корзина пуста</h4>
-        <a asp-action="Index" class="btn btn-primary">Продолжить покупки</a>
-    </div>
-}
-else
-{
-    <div class="cart-items">
-        @foreach (var item in Model)
-        {
-            <div class="cart-item row align-items-center mb-3 p-3 border rounded">
-                <div class="col-md-2">
-                    @if (item.Catalog.HasPhoto)
+<div class="cart-page py-4">
+    <div class="container">
+        <!-- ЗАГОЛОВОК -->
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="h2 mb-1">
+                    <i class="fas fa-shopping-cart text-primary me-2"></i>
+                    Ваша корзина
+                    @if (Model.Any())
                     {
-                        <img src="@item.Catalog.PhotoBase64" class="img-fluid" style="max-height:80px" />
+                        <span class="badge bg-primary fs-6 ms-2">@Model.Count() товаров</span>
                     }
+                </h1>
+                <small class="text-muted">@Model.Sum(i => i.Quantity) шт. на сумму @Model.Sum(i => i.Quantity * i.Catalog.Price).ToString("C")</small>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Продолжить покупки
+            </a>
+        </div>
+
+        <!-- УВЕДОМЛЕНИЯ -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <!-- ПУСТАЯ КОРЗИНА -->
+            <div class="empty-cart text-center py-5 my-5">
+                <div class="empty-cart-icon mb-4">
+                    <i class="fas fa-shopping-cart fa-4x text-muted"></i>
                 </div>
-                <div class="col-md-6">
-                    <h5>@item.Catalog.Product</h5>
-                    <small>@item.Catalog.Category?.Name</small>
+                <h3 class="text-muted mb-3">Корзина пуста</h3>
+                <p class="lead text-muted mb-4">Добавьте товары из каталога для оформления заказа</p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a asp-action="Index" class="btn btn-primary btn-lg">
+                        <i class="fas fa-cookie-bite me-2"></i>Выбрать кондитерские изделия
+                    </a>
+                    <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-home me-2"></i>На главную
+                    </a>
                 </div>
-                <div class="col-md-2 text-center">
-                    <span class="qty">@item.Quantity шт</span><br>
-                    <span class="price">@item.Catalog.Price.ToString("C")</span>
-                </div>
-                <div class="col-md-2 text-end">
-                    <strong>@((item.Quantity * item.Catalog.Price).ToString("C"))</strong><br>
-                    <form asp-action="RemoveFromBasket" asp-route-basketCatalogId="@item.Id_BasketCatalog" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить?')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
+            </div>
+        }
+        else
+        {
+            <!-- ТОВАРЫ В КОРЗИНЕ -->
+            <div class="row g-4 mb-5">
+                @foreach (var item in Model)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="cart-item card h-100 shadow-sm border-0 overflow-hidden">
+                            <!-- ИЗОБРАЖЕНИЕ -->
+                            <div class="position-relative overflow-hidden">
+                                @if (item.Catalog.HasPhoto && item.Catalog.Photo != null)
+                                {
+                                    <img src="@item.Catalog.PhotoBase64"
+                                         class="card-img-top img-fluid"
+                                         style="height: 200px; object-fit: cover;"
+                                         alt="@item.Catalog.Product" />
+                                }
+                                else
+                                {
+                                    <div class="no-image d-flex align-items-center justify-content-center bg-light"
+                                         style="height: 200px;">
+                                        <i class="fas fa-cookie-bite fa-3x text-muted"></i>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- КОНТЕНТ -->
+                            <div class="card-body p-4">
+                                <h5 class="card-title mb-2">@item.Catalog.Product</h5>
+                                <div class="category mb-3">
+                                    <small class="badge bg-light text-dark">@item.Catalog.Category?.Name</small>
+                                </div>
+
+                                <!-- ЦЕНА ЗА ШТУКУ -->
+                                <div class="price-per-unit mb-3">
+                                    <span class="h5 text-success fw-bold">@item.Catalog.Price.ToString("C")</span>
+                                    <small class="text-muted"> / шт</small>
+                                </div>
+
+                                <!-- КНОПКИ КОЛИЧЕСТВА -->
+                                <div class="quantity-controls mb-4">
+                                    <form asp-action="UpdateBasketItem" asp-route-basketCatalogId="@item.Id_BasketCatalog"
+                                          method="post" class="quantity-form d-inline">
+                                        <input type="hidden" name="quantity" id="qty-@item.Id_BasketCatalog" value="@item.Quantity" />
+                                        <div class="qty-buttons">
+                                            <button type="button" class="btn-qty btn-minus"
+                                                    data-id="@item.Id_BasketCatalog" data-max="99"
+                                                    @(item.Quantity <= 1 ? "disabled" : "") title="Уменьшить количество">
+                                                −
+                                            </button>
+                                            <span class="qty-display">@item.Quantity</span>
+                                            <button type="button" class="btn-qty btn-plus"
+                                                    data-id="@item.Id_BasketCatalog" data-max="99" title="Добавить в корзину">
+                                                +
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- ОБЩАЯ СУММА -->
+                                <div class="item-total mb-4">
+                                    <h4 class="text-danger mb-0">@((item.Quantity * item.Catalog.Price).ToString("C"))</h4>
+                                </div>
+
+                                <!-- УДАЛИТЬ -->
+                                <form asp-action="RemoveFromBasket" asp-route-basketCatalogId="@item.Id_BasketCatalog"
+                                      method="post" class="delete-form">
+                                    <button type="submit" class="btn btn-danger w-100 rounded-pill shadow-sm"
+                                            onclick="return confirm('Удалить «@item.Catalog.Product» из корзины?')">
+                                        <i class="fas fa-trash-alt me-1"></i>Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- ИТОГОВЫЙ БЛОК -->
+            <div class="cart-total-section">
+                <div class="row align-items-end">
+                    <div class="col-md-8">
+                        <!-- СТАТИСТИКА -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="stat-card text-center p-3 bg-light rounded-3 shadow-sm">
+                                    <i class="fas fa-boxes fa-2x text-primary mb-2"></i>
+                                    <div class="h5 fw-bold">@Model.Count()</div>
+                                    <div class="text-muted">товаров</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card text-center p-3 bg-light rounded-3 shadow-sm">
+                                    <i class="fas fa-hashtag fa-2x text-success mb-2"></i>
+                                    <div class="h5 fw-bold">@Model.Sum(i => i.Quantity)</div>
+                                    <div class="text-muted">штук</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card text-center p-3 bg-warning bg-opacity-10 rounded-3 shadow-sm border-warning">
+                                    <i class="fas fa-ruble-sign fa-2x text-warning mb-2"></i>
+                                    <div class="h4 fw-bold mb-0">@Model.Sum(i => i.Quantity * i.Catalog.Price).ToString("C")</div>
+                                    <div class="text-muted small">итого</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="checkout-card card shadow-lg border-0 h-100">
+                            <div class="card-body p-4 text-center">
+                                <h3 class="card-title text-primary mb-4 fw-bold">
+                                    <i class="fas fa-receipt me-2"></i>Итого к оплате
+                                </h3>
+                                <div class="h2 fw-bold text-success mb-4 checkout-total">
+                                    @Model.Sum(i => i.Quantity * i.Catalog.Price).ToString("C")
+                                </div>
+
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <!-- ✅ КНОПКА ОФОРМЛЕНИЯ ЗАКАЗА -->
+                                    <form asp-action="Checkout" method="post" class="checkout-form mb-3">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-success btn-lg w-100 checkout-btn shadow-lg"
+                                                onclick="return confirm('Подтвердить создание заказа? Корзина будет очищена.')">
+                                            <i class="fas fa-credit-card me-2"></i>
+                                            Оформить заказ
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <div class="auth-required mb-3 p-4 bg-light rounded-3">
+                                        <i class="fas fa-user-lock fa-2x text-muted mb-3 d-block"></i>
+                                        <h5 class="text-muted mb-3">Для оформления заказа нужна авторизация</h5>
+                                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary w-100 mb-2">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Войти
+                                        </a>
+                                        <div class="text-center">
+                                            <small class="text-muted">или</small>
+                                        </div>
+                                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary w-100 mt-2">
+                                            <i class="fas fa-user-plus me-2"></i>Зарегистрироваться
+                                        </a>
+                                    </div>
+                                }
+
+                                <div class="text-muted small mt-3">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Безопасная оплата · Быстрая доставка · Гарантия качества
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         }
     </div>
+</div>
 
-    <div class="cart-total text-end mt-4">
-        <h4>Итого: @Model.Sum(i => i.Quantity * i.Catalog.Price).ToString("C")</h4>
-        <a asp-action="Checkout" class="btn btn-success btn-lg">Оформить заказ</a>
-    </div>
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 🔧 КНОПКИ КОЛИЧЕСТВА (+ увеличивает, - уменьшает)
+            document.querySelectorAll('.btn-qty').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const id = this.dataset.id;
+                    const qtyInput = document.getElementById('qty-' + id);
+                    const maxQty = parseInt(this.dataset.max);
+                    let qty = parseInt(qtyInput.value);
+
+                    if (this.classList.contains('btn-plus') && qty < maxQty) {
+                        qtyInput.value = qty + 1;
+                        qtyInput.form.submit();
+                    } else if (this.classList.contains('btn-minus') && qty > 1) {
+                        qtyInput.value = qty - 1;
+                        qtyInput.form.submit();
+                    }
+                });
+            });
+
+            // 🎨 АНИМАЦИЯ КНОПОК УДАЛЕНИЯ
+            document.querySelectorAll('.delete-form button').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // 📱 МОБИЛЬНЫЕ УВЕДОМЛЕНИЯ
+            if (window.innerWidth < 768) {
+                document.querySelectorAll('.alert').forEach(alert => {
+                    setTimeout(() => {
+                        alert.style.transition = 'opacity 0.5s';
+                        alert.style.opacity = '0';
+                    }, 5000);
+                });
+            }
+        });
+    </script>
 }
