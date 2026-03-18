@@ -1,56 +1,109 @@
 ﻿@model Confectionery.Models.User
-
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "➕ Добавить пользователя";
 }
-<link rel="stylesheet" href="~/css/Registra.css" />
 
-<h1>Регистрация</h1>
-<hr />
-<div class="row">
-    <div class="col-md-4 mx-auto">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="Login" class="control-label">Логин</label>
-                <input asp-for="Login" class="form-control" />
-                <span asp-validation-for="Login" class="text-danger"></span>
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <!-- Заголовок -->
+            <div class="text-center mb-5 admin-fade-in">
+                <div class="avatar-container mb-4">
+                    <div class="avatar admin-avatar-large admin-avatar-blue">
+                        <i class="fas fa-user-plus fa-2x"></i>
+                    </div>
+                </div>
+                <h1 class="display-5 fw-bold text-primary mb-2">Добавить пользователя</h1>
+                <p class="lead text-muted mb-0">Заполните форму для создания нового аккаунта</p>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Name" class="control-label">Имя</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
+            <!-- Форма -->
+            <div class="card shadow-xl admin-card">
+                <div class="card-header admin-gradient-primary text-white py-4">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-plus me-3"></i>Новый пользователь
+                    </h3>
+                </div>
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger m-4 d-none" id="validationSummary"></div>
 
-            <div class="form-group">
-                <label asp-for="Id_Role" class="control-label">Роль</label>
-                <select asp-for="Id_Role" class="form-control" asp-items="ViewBag.Id_Role"></select>
-            </div>
+                    <div class="card-body py-5">
+                        <div class="row g-4">
+                            <!-- Левая колонка -->
+                            <div class="col-lg-6">
+                                <div class="form-floating mb-4">
+                                    <input asp-for="Login" class="form-control form-control-lg" id="floatingLogin" required />
+                                    <label for="floatingLogin">
+                                        <i class="fas fa-user-circle text-primary me-2"></i>Логин *
+                                    </label>
+                                    <span asp-validation-for="Login" class="text-danger small mt-1 d-block"></span>
+                                </div>
 
-            <div class="form-group">
-                <label asp-for="Password" class="control-label">Пароль</label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
+                                <div class="form-floating mb-4">
+                                    <input asp-for="Name" class="form-control form-control-lg" id="floatingName" required />
+                                    <label for="floatingName">
+                                        <i class="fas fa-user-tag text-success me-2"></i>Имя *
+                                    </label>
+                                    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                                </div>
 
-            <div class="form-group">
-                <label for="ConfirmPassword" class="control-label">Повторите пароль</label>
-                <input type="password" id="ConfirmPassword" class="form-control" />
-                <span id="confirmPasswordError" class="text-danger"></span>
-            </div>
+                                <div class="form-floating mb-4">
+                                    <input asp-for="Email" type="email" class="form-control form-control-lg" id="floatingEmail" />
+                                    <label for="floatingEmail">
+                                        <i class="fas fa-envelope text-danger me-2"></i>Email
+                                    </label>
+                                    <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
 
-            <div class="form-group">
-                <label asp-for="Email" class="control-label">Электронная почта</label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
+                            <!-- Правая колонка -->
+                            <div class="col-lg-6">
+                                <div class="form-floating mb-4">
+                                    <input asp-for="Password" type="password" class="form-control form-control-lg"
+                                           id="floatingPassword" required minlength="6" />
+                                    <label for="floatingPassword">
+                                        <i class="fas fa-lock text-warning me-2"></i>Пароль *
+                                    </label>
+                                    <div class="form-text small">Минимум 6 символов</div>
+                                    <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                                </div>
 
-            <div class="form-group mt-3">
-                <input type="submit" value="Создать" class="btn btn-primary" />
+                                <div class="form-floating mb-4">
+                                    <input type="password" id="ConfirmPassword" class="form-control form-control-lg" required />
+                                    <label for="ConfirmPassword">
+                                        <i class="fas fa-lock-open text-info me-2"></i>Повторите пароль *
+                                    </label>
+                                    <span id="confirmPasswordError" class="text-danger small mt-1 d-block"></span>
+                                </div>
+
+                                <div class="form-floating mb-4">
+                                    <select asp-for="Id_Role" class="form-select form-select-lg admin-role-select"
+                                            id="floatingRole" required asp-items="ViewBag.Id_Role">
+                                        <option value="">Выберите роль</option>
+                                    </select>
+                                    <label for="floatingRole">
+                                        <i class="fas fa-user-shield text-info me-2"></i>Роль *
+                                    </label>
+                                    <span asp-validation-for="Id_Role" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки -->
+                    <div class="card-footer bg-light border-0 py-4">
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <button type="submit" class="btn btn-success btn-lg px-5 py-2">
+                                <i class="fas fa-plus-circle me-2"></i>➕ Создать пользователя
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 py-2">
+                                <i class="fas fa-arrow-left me-2"></i>К списку
+                            </a>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -59,17 +112,30 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        const form = document.querySelector('form');
-        const passwordInput = document.querySelector('#Password');
-        const confirmPasswordInput = document.querySelector('#ConfirmPassword');
-        const confirmPasswordError = document.querySelector('#confirmPasswordError');
+        // ✅ Подтверждение пароля
+        const passwordInput = document.getElementById('Password');
+        const confirmPasswordInput = document.getElementById('ConfirmPassword');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
 
-        form.addEventListener('submit', function (e) {
-            if (passwordInput.value !== confirmPasswordInput.value) {
-                e.preventDefault();
-                confirmPasswordError.innerHTML = 'Пароли не совпадают.';
+        function validatePasswordMatch() {
+            if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordError.textContent = '❌ Пароли не совпадают';
+                confirmPasswordInput.classList.add('is-invalid');
             } else {
-                confirmPasswordError.innerHTML = '';
+                confirmPasswordError.textContent = '';
+                confirmPasswordInput.classList.remove('is-invalid');
+            }
+        }
+
+        confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+        passwordInput.addEventListener('input', validatePasswordMatch);
+
+        // ✅ Проверка формы перед отправкой
+        document.querySelector('form').addEventListener('submit', function(e) {
+            validatePasswordMatch();
+            if (confirmPasswordError.textContent) {
+                e.preventDefault();
+                confirmPasswordError.scrollIntoView({ behavior: 'smooth' });
             }
         });
     </script>

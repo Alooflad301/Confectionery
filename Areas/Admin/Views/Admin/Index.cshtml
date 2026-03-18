@@ -1,111 +1,111 @@
-﻿@{
-    ViewData["Title"] = "Дашборд - Админ панель";
-    dynamic stats = ViewBag.Stats;
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Админ панель";
 }
 
-<div class="container-fluid py-4">
-    <!-- СТАТИСТИКА -->
-    <div class="row g-4 mb-5">
-        <div class="col-xl-3 col-lg-6 col-md-6">
-            <div class="card h-100 shadow-lg border-0">
-                <div class="card-body text-center p-4">
-                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
-                    <h3 class="fw-bold text-primary">@(stats?.UsersCount ?? 0)</h3>
-                    <p class="text-muted mb-0">Пользователей</p>
+<div class="admin-dashboard py-5 bg-light">
+    <div class="container">
+        <!-- 🔥 ЗАГОЛОВОК -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="fas fa-crown me-3"></i>
+                Админ панель
+            </h1>
+            <p class="lead text-muted">Управление кондитерской</p>
+        </div>
+
+        <!-- 📊 KPI КАРТОЧКИ -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="card shadow h-100 text-center border-start-primary border-start-lg-5">
+                    <div class="card-body py-4">
+                        <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                        <h3 class="text-primary">@ViewBag.UsersCount</h3>
+                        <p class="text-muted mb-0">Пользователей</p>
+                        <a asp-action="Users" class="btn btn-outline-primary btn-sm mt-2">👥 Управлять</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card shadow h-100 text-center border-start-success border-start-lg-5">
+                    <div class="card-body py-4">
+                        <i class="fas fa-shopping-bag fa-2x text-success mb-3"></i>
+                        <h3 class="text-success">@ViewBag.OrdersCount</h3>
+                        <p class="text-muted mb-0">Заказов</p>
+                        <a asp-action="Orders" class="btn btn-outline-success btn-sm mt-2">📦 Управлять</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card shadow h-100 text-center border-start-info border-start-lg-5">
+                    <div class="card-body py-4">
+                        <i class="fas fa-cookie-bite fa-2x text-info mb-3"></i>
+                        <h3 class="text-info">@ViewBag.ProductsCount</h3>
+                        <p class="text-muted mb-0">Товаров</p>
+                        <a asp-action="Products" class="btn btn-outline-info btn-sm mt-2">🧁 Управлять</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card shadow h-100 text-center border-start-warning border-start-lg-5">
+                    <div class="card-body py-4">
+                        <i class="fas fa-tags fa-2x text-warning mb-3"></i>
+                        <h3 class="text-warning">@ViewBag.CategoriesCount</h3>
+                        <p class="text-muted mb-0">Категорий</p>
+                        <a asp-action="Categories" class="btn btn-outline-warning btn-sm mt-2">🏷️ Управлять</a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-lg-6 col-md-6">
-            <div class="card h-100 shadow-lg border-0">
-                <div class="card-body text-center p-4">
-                    <i class="fas fa-shopping-bag fa-3x text-success mb-3"></i>
-                    <h3 class="fw-bold text-success">@(stats?.OrdersCount ?? 0)</h3>
-                    <p class="text-muted mb-0">Заказов</p>
-                </div>
+        <!-- 🎯 БЫСТРЫЕ ДЕЙСТВИЯ -->
+        <div class="row g-4">
+            <div class="col-md-4">
+                <a asp-action="Users" class="text-decoration-none">
+                    <div class="card shadow h-100 border-0 bg-primary text-white">
+                        <div class="card-body text-center py-4">
+                            <i class="fas fa-users fa-3x mb-3 opacity-75"></i>
+                            <h5>👥 Пользователи</h5>
+                            <p class="mb-0">Управление аккаунтами</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a asp-action="Orders" class="text-decoration-none">
+                    <div class="card shadow h-100 border-0 bg-success text-white">
+                        <div class="card-body text-center py-4">
+                            <i class="fas fa-shopping-bag fa-3x mb-3 opacity-75"></i>
+                            <h5>📦 Заказы</h5>
+                            <p class="mb-0">Все заказы клиентов</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a asp-action="Products" class="text-decoration-none">
+                    <div class="card shadow h-100 border-0 bg-info text-white">
+                        <div class="card-body text-center py-4">
+                            <i class="fas fa-cookie-bite fa-3x mb-3 opacity-75"></i>
+                            <h5>🧁 Товары</h5>
+                            <p class="mb-0">Каталог кондитерских изделий</p>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
 
-        <div class="col-xl-3 col-lg-6 col-md-6">
-            <div class="card h-100 shadow-lg border-0">
-                <div class="card-body text-center p-4">
-                    <i class="fas fa-ruble-sign fa-3x text-warning mb-3"></i>
-                    <h3 class="fw-bold text-warning">@((stats?.TotalRevenue ?? 0).ToString("C"))</h3>
-                    <p class="text-muted mb-0">Выручка</p>
-                </div>
+        <!-- ✅ УВЕДОМЛЕНИЯ -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible mt-4 fade show">
+                <i class="fas fa-check-circle me-2"></i>
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        </div>
-
-        <div class="col-xl-3 col-lg-6 col-md-6">
-            <div class="card h-100 shadow-lg border-0">
-                <div class="card-body text-center p-4">
-                    <i class="fas fa-cookie-bite fa-3x text-info mb-3"></i>
-                    <h3 class="fw-bold text-info">@(stats?.ProductsCount ?? 0)</h3>
-                    <p class="text-muted mb-0">Товаров</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- БЫСТРЫЕ ССЫЛКИ -->
-    <div class="row g-4">
-        <div class="col-lg-3 col-md-6">
-            <a asp-action="Users" class="text-decoration-none">
-                <div class="card h-100 shadow-lg border-0 hover-card">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
-                        <h4 class="mb-2">Пользователи</h4>
-                        <p class="text-muted mb-0">Управление аккаунтами</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <a asp-action="Orders" class="text-decoration-none">
-                <div class="card h-100 shadow-lg border-0 hover-card">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-shopping-bag fa-3x text-success mb-3"></i>
-                        <h4 class="mb-2">Заказы</h4>
-                        <p class="text-muted mb-0">Обработка заказов</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <a asp-action="Products" class="text-decoration-none">
-                <div class="card h-100 shadow-lg border-0 hover-card">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-cookie-bite fa-3x text-warning mb-3"></i>
-                        <h4 class="mb-2">Товары</h4>
-                        <p class="text-muted mb-0">Каталог товаров</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <a asp-controller="Categories" asp-action="Index" class="text-decoration-none">
-                <div class="card h-100 shadow-lg border-0 hover-card">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-tags fa-3x text-info mb-3"></i>
-                        <h4 class="mb-2">Категории</h4>
-                        <p class="text-muted mb-0">Управление категориями</p>
-                    </div>
-                </div>
-            </a>
-        </div>
+        }
     </div>
 </div>
-
-<style>
-    .hover-card {
-        transition: all 0.3s ease;
-    }
-
-        .hover-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
-        }
-</style>

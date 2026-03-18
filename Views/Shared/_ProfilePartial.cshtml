@@ -11,7 +11,7 @@
             </a>
 
             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-2"
-                style="border-radius: 20px; min-width: 240px; backdrop-filter: blur(10px);">
+                style="border-radius: 20px; min-width: 280px; backdrop-filter: blur(10px); max-height: 80vh; overflow-y: auto;">
 
                 <!-- ✅ ПРОФИЛЬ -->
                 <li>
@@ -19,7 +19,7 @@
                        asp-controller="Account" asp-action="Profile"
                        style="transition: all 0.3s ease;">
                         <i class="fas fa-user me-3 text-primary"></i>
-                        <span>Профиль</span>
+                        <span>👤 Профиль</span>
                     </a>
                 </li>
 
@@ -29,29 +29,12 @@
                        asp-controller="Account" asp-action="Orders"
                        style="transition: all 0.3s ease;">
                         <i class="fas fa-shopping-bag me-3 text-success"></i>
-                        <span>Заказы</span>
+                        <span>📦 Мои заказы</span>
                     </a>
                 </li>
 
-                <!-- ✅ АДМИН ПАНЕЛЬ (только для Администратора) -->
-                @if (User.IsInRole("Администратор"))
-                {
-                    <li>
-                        <a class="dropdown-item py-3 px-4 rounded-3 mb-1 bg-warning bg-opacity-10 border-start border-warning border-3"
-                           asp-area="Admin" asp-controller="Admin" asp-action="Index"
-                           style="transition: all 0.3s ease;">
-                            <i class="fas fa-cogs me-3 text-warning"></i>
-                            <span class="fw-bold">👨‍💼 Админ панель</span>
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider my-1 border-warning opacity-50"></li>
-                }
-
                 <!-- ✅ РАЗДЕЛИТЕЛЬ -->
-                @if (!User.IsInRole("Администратор"))
-                {
-                    <li><hr class="dropdown-divider my-2"></li>
-                }
+                <li><hr class="dropdown-divider my-2"></li>
 
                 <!-- ✅ ВЫХОД -->
                 <li>
@@ -60,7 +43,7 @@
                         <button type="submit" class="dropdown-item py-3 px-4 rounded-3 w-100 text-start border-0 bg-transparent logout-btn"
                                 style="transition: all 0.3s ease;">
                             <i class="fas fa-sign-out-alt me-3 text-danger"></i>
-                            <span>Выйти из аккаунта</span>
+                            <span>🚪 Выйти из аккаунта</span>
                         </button>
                     </form>
                 </li>

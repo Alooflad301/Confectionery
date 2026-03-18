@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="~/Confectionery.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/catalog.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/AdminUsers.css" />
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 
 
@@ -38,6 +39,12 @@
                         <li class="nav-item dropdown ms-3">
                             <partial name="_ProfilePartial" />
                         </li>
+                        @if (User.IsInRole("Администратор"))
+                        {
+                            <li class="nav-item dropdown ms-3">
+                                <partial name="_AdminPartial" />
+                            </li>
+                        }
                     </ul>
 
                 </div>
@@ -59,5 +66,59 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        let adminData = {};
+
+        // Загрузка статистики при загрузке страницы
+        $(document).ready(function() {
+            if (@Json.Serialize(User.IsInRole("Администратор"))) {
+                loadAdminStats();
+            }
+        });
+
+        function loadAdminStats() {
+            $.get('/Admin/GetAdminData', function(data) {
+                adminData = data;
+                $('#admin-users-count').text(data.usersCount || 0);
+                $('#admin-orders-count').text(data.ordersCount || 0);
+                $('#admin-products-count').text(data.productsCount || 0);
+            }).fail(function() {
+                $('#admin-users-count, #admin-orders-count, #admin-products-count').text('—');
+            });
+        }
+
+        function reloadAdminStats() {
+            loadAdminStats();
+        }
+
+        function showAdminSection(section) {
+            hideAdminSections();
+            $('#admin-' + section + '-section').show();
+            $('html, body').animate({ scrollTop: $('#admin-' + section + '-section').offset().top - 100 }, 500);
+
+            // Загружаем данные секции
+            loadAdminSectionData(section);
+        }
+
+        function hideAdminSections() {
+            $('.admin-section').hide();
+        }
+
+        function loadAdminSectionData(section) {
+            const sections = {
+                'users': '/Admin/GetUsers',
+                'orders': '/Admin/GetOrders',
+                'products': '/Admin/GetProducts'
+            };
+
+            if (sections[section]) {
+                $.get(sections[section], function(data) {
+                    $('#admin-' + section + '-list').html(data);
+                });
+            }
+        }
+    </script>
+
+
 </body>
 </html>

@@ -1,0 +1,105 @@
+﻿<div class="dropdown">
+    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark p-2 rounded-pill fw-bold"
+       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+       style="transition: all 0.3s ease; border: 2px solid #ffc107; background: linear-gradient(45deg, #fff3cd, #ffeaa7);">
+        <i class="fas fa-crown fa-lg text-warning"></i>
+        <span class="d-none d-md-inline">👑 Админ</span>
+        <i class="fas fa-chevron-down ms-1 small opacity-75"></i>
+    </a>
+
+    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-3"
+        style="border-radius: 20px; min-width: 320px; max-height: 80vh; overflow-y: auto; backdrop-filter: blur(10px);">
+
+        <!-- 🔥 СТАТИСТИКА -->
+        <li class="dropdown-header py-2">
+            <h6 class="fw-bold text-primary mb-2">
+                <i class="fas fa-chart-bar me-2"></i>📊 Быстрая статистика
+            </h6>
+            <div class="row g-2 text-center mb-3">
+                <div class="col-4">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded">
+                        <small class="text-primary fw-bold" id="admin-users-count">0</small>
+                        <div class="small text-muted">👥 Users</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="bg-success bg-opacity-10 p-2 rounded">
+                        <small class="text-success fw-bold" id="admin-orders-count">0</small>
+                        <div class="small text-muted">📦 Orders</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="bg-info bg-opacity-10 p-2 rounded">
+                        <small class="text-info fw-bold" id="admin-products-count">0</small>
+                        <div class="small text-muted">🧁 Products</div>
+                    </div>
+                </div>
+            </div>
+        </li>
+
+        <li><hr class="dropdown-divider my-2"></li>
+
+        <!-- 🔥 УПРАВЛЕНИЕ -->
+        <li>
+            <a class="dropdown-item py-3 px-4 rounded-3 mb-1"
+               asp-controller="Users" asp-action="Index"
+               style="transition: all 0.3s ease;">
+                <i class="fas fa-users me-3 text-primary"></i>
+                <span>👥 Пользователи</span>
+            </a>
+        </li>
+
+        <li>
+            <a class="dropdown-item py-3 px-4 rounded-3 mb-1"
+               onclick="showAdminSection('orders'); return false;"
+               style="cursor: pointer; transition: all 0.3s ease;">
+                <i class="fas fa-shopping-bag me-3 text-success"></i>
+                <span>📦 Заказы</span>
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item py-3 px-4 rounded-3 mb-1"
+               onclick="showAdminSection('products'); return false;"
+               style="cursor: pointer; transition: all 0.3s ease;">
+                <i class="fas fa-cookie-bite me-3 text-info"></i>
+                <span>🧁 Товары</span>
+            </a>
+        </li>
+
+        <li><hr class="dropdown-divider my-2"></li>
+
+        <!-- 🔥 КНОПКИ ДЕЙСТВИЙ -->
+        <li>
+            <div class="d-grid gap-2">
+                <button class="btn btn-warning btn-sm py-2 fw-bold" onclick="reloadAdminStats()">
+                    <i class="fas fa-sync-alt me-2"></i>Обновить
+                </button>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<!-- 🔥 АДМИН СЕКЦИИ (скрыты) -->
+<div id="admin-users-section" class="admin-section mt-4 p-4 border rounded shadow-lg bg-light" style="display: none;">
+    <div class="d-flex justify-content-between mb-3">
+        <h5>👥 Пользователи</h5>
+        <button class="btn btn-sm btn-outline-secondary" onclick="hideAdminSections()">✕</button>
+    </div>
+    <div id="admin-users-list">Загрузка...</div>
+</div>
+
+<div id="admin-orders-section" class="admin-section mt-4 p-4 border rounded shadow-lg bg-light" style="display: none;">
+    <div class="d-flex justify-content-between mb-3">
+        <h5>📦 Заказы</h5>
+        <button class="btn btn-sm btn-outline-secondary" onclick="hideAdminSections()">✕</button>
+    </div>
+    <div id="admin-orders-list">Загрузка...</div>
+</div>
+
+<div id="admin-products-section" class="admin-section mt-4 p-4 border rounded shadow-lg bg-light" style="display: none;">
+    <div class="d-flex justify-content-between mb-3">
+        <h5>🧁 Товары</h5>
+        <button class="btn btn-sm btn-outline-secondary" onclick="hideAdminSections()">✕</button>
+    </div>
+    <div id="admin-products-list">Загрузка...</div>
+</div>

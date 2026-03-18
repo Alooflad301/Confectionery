@@ -1,59 +1,142 @@
 ﻿@model IEnumerable<Confectionery.Models.User>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "👥 Пользователи";
 }
 
-<h1>Index</h1>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Заголовок и кнопка добавления -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2 mb-1 text-primary">
+                        <i class="fas fa-users me-2"></i>👥 Пользователи
+                    </h1>
+                    <small class="text-muted">Управление пользователями системы</small>
+                </div>
+                <a asp-action="Create" class="btn btn-success btn-lg px-4">
+                    <i class="fas fa-plus-circle me-2"></i>Добавить пользователя
+                </a>
+            </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Login)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Role)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Password)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Login)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Role.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Password)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id_User">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id_User">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id_User">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+            <!-- Уведомления -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Таблица -->
+            <div class="card shadow-lg border-0 admin-card">
+                <div class="card-header admin-gradient-primary text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Список пользователей
+                        <span class="badge bg-light text-dark ms-2">@Model.Count()</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 admin-table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 70px;" class="text-center">
+                                        <i class="fas fa-hashtag admin-table-icon"></i>
+                                    </th>
+                                    <th style="width: 180px;">
+                                        <i class="fas fa-user admin-table-icon"></i>Логин
+                                    </th>
+                                    <th style="width: 150px;">
+                                        <i class="fas fa-user-tag admin-table-icon"></i>Имя
+                                    </th>
+                                    <th style="width: 220px;">
+                                        <i class="fas fa-envelope admin-table-icon"></i>Email
+                                    </th>
+                                    <th style="width: 140px;">
+                                        <i class="fas fa-user-shield admin-table-icon"></i>Роль
+                                    </th>
+                                    <th style="width: 180px;" class="text-center">
+                                        <i class="fas fa-cogs admin-table-icon"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                @foreach (var item in Model)
+                                {
+                                    <tr class="align-middle">
+                                        <td class="text-center fw-bold text-primary">
+                                            #@item.Id_User
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark">@item.Login</div>
+                                            <small class="text-muted">ID: @item.Id_User</small>
+                                        </td>
+                                        <td>
+                                            <div>@(item.Name ?? "—")</div>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-envelope text-muted me-1"></i>
+                                            <span class="text-break">@(item.Email ?? "—")</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @(item.Role?.Name == "Администратор" ? "admin-role-admin" : "admin-role-user") fs-6 px-3 py-2">
+                                                @(item.Role?.Name ?? "—")
+                                            </span>
+                                        </td>
+                                        
+                                        <td class="text-center">
+                                            <div class="btn-group admin-btn-group" role="group">
+                                                <a asp-action="Edit" asp-route-id="@item.Id_User"
+                                                   class="btn btn-outline-primary px-3 py-1 me-1"
+                                                   title="Редактировать">
+                                                    <i class="fas fa-edit me-1"></i>Редактировать
+                                                </a>
+                                                <a asp-action="Details" asp-route-id="@item.Id_User"
+                                                   class="btn btn-outline-info px-3 py-1 me-1"
+                                                   title="Подробности">
+                                                    <i class="fas fa-eye me-1"></i>Детали
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.Id_User"
+                                                   class="btn btn-outline-danger px-3 py-1"
+                                                   title="Удалить"
+                                                   onclick="return confirm('Удалить пользователя «@item.Login»?')">
+                                                    <i class="fas fa-trash me-1"></i>Удалить
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                       
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Пустое состояние -->
+            @if (!Model.Any())
+            {
+                <div class="admin-empty-state text-center py-5 my-5 admin-fade-in">
+                    <div class="admin-empty-icon">
+                        <i class="fas fa-users-slash"></i>
+                    </div>
+                    <h3 class="text-muted mb-4">Пользователей пока нет</h3>
+                    <p class="lead text-muted mb-4">Начните с добавления первого администратора</p>
+                    <a asp-action="Create" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-user-plus me-2"></i>Добавить первого пользователя
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
