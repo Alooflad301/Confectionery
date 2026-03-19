@@ -45,14 +45,16 @@
     <!-- 🛠️ ФИЛЬТРЫ -->
     <div class="filters-panel mb-4">
         <div class="row g-3">
-            <!-- Фильтры -->
-            <div class="col-md-8">
+            <!-- 🔥 ФОРМА ФИЛЬТРОВ -->
+            <div class="col-lg-9">
                 <form asp-action="Index" method="get" class="filters-form">
+                    <!-- Скрытые поля -->
                     <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
                     <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort" />
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <!-- Категория -->
+                        <div class="col-md-4">
                             <div class="filter-group">
                                 <label>🏷️ Категория:</label>
                                 <select name="categoryId" class="form-select">
@@ -67,44 +69,54 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+
+                        <!-- Цена -->
+                        <div class="col-md-4">
                             <div class="filter-group price-filter">
                                 <label>💰 Цена:</label>
-                                <div class="price-inputs">
-                                    <input type="number" name="minPrice" class="form-control" value="@ViewBag.MinPrice" min="0">
-                                    <span>-</span>
-                                    <input type="number" name="maxPrice" class="form-control" value="@ViewBag.MaxPrice" min="0">
+                                <div class="price-inputs d-flex gap-1">
+                                    <input type="number" name="minPrice" class="form-control form-control-sm"
+                                           placeholder="от" value="@ViewBag.MinPrice" min="0" max="100000" step="10">
+                                    <span class="align-self-center">-</span>
+                                    <input type="number" name="maxPrice" class="form-control form-control-sm"
+                                           placeholder="до" value="@ViewBag.MaxPrice" min="0" max="100000" step="10">
                                 </div>
+                                <div class="form-text small mt-1">Макс. 100 000 ₽</div>
                             </div>
                         </div>
+
+                        <!-- Кнопки -->
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-filter me-1"></i>Применить
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Очистить</a>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary me-2">
-                        <i class="fas fa-filter"></i> Применить
-                    </button>
-                    <a asp-action="Index" class="btn btn-outline-secondary">Очистить</a>
                 </form>
             </div>
 
-            <!-- 🔥 НОВАЯ СОРТИРОВКА -->
-            <div class="col-md-4">
-                <form id="sortForm" asp-action="Index" method="get">
+            <!-- 🔥 СОРТИРОВКА ОТДЕЛЬНО -->
+            <div class="col-lg-3">
+                <form asp-action="Index" method="get" id="sortForm">
+                    <!-- Скрытые поля для сортировки -->
                     <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
                     <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
                     <input type="hidden" name="minPrice" value="@ViewBag.MinPrice" />
                     <input type="hidden" name="maxPrice" value="@ViewBag.MaxPrice" />
-                    <input type="hidden" name="page" value="@ViewBag.CurrentPage" />
 
-                    <label>🔄 Сортировать:</label>
-                    <select name="sortOrder" class="form-select" onchange="this.form.submit()">
-                        <option value="">По умолчанию</option>
-                        <option value="name_asc" selected="@(ViewBag.CurrentSort == "name_asc")">А→Я</option>
-                        <option value="name_desc" selected="@(ViewBag.CurrentSort == "name_desc")">Я→А</option>
-                        <option value="price_asc" selected="@(ViewBag.CurrentSort == "price_asc")">Дешевле→Дороже</option>
-                        <option value="price_desc" selected="@(ViewBag.CurrentSort == "price_desc")">Дороже→Дешевле</option>
-                    </select>
+                    <div class="filter-group h-100 d-flex flex-column justify-content-end">
+                        <label>🔄 Сортировать:</label>
+                        <select name="sortOrder" class="form-select" onchange="this.form.submit()">
+                            <option value="">По умолчанию</option>
+                            <option value="name_asc" selected="@(ViewBag.CurrentSort == "name_asc")">А→Я (алфавит)</option>
+                            <option value="name_desc" selected="@(ViewBag.CurrentSort == "name_desc")">Я→А</option>
+                            <option value="price_asc" selected="@(ViewBag.CurrentSort == "price_asc")">Дешевле→Дороже</option>
+                            <option value="price_desc" selected="@(ViewBag.CurrentSort == "price_desc")">Дороже→Дешевле</option>
+                        </select>
+                    </div>
                 </form>
             </div>
-
         </div>
     </div>
 

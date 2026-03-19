@@ -20,6 +20,7 @@ namespace Confectionery.Controllers
         public async Task<IActionResult> Index(string searchString, string sortOrder,
     int? categoryId, decimal? minPrice, decimal? maxPrice, int? page)
         {
+
             // 🔥 СОРТИРОВКА
             ViewBag.CurrentSort = sortOrder;
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_asc" : "";
@@ -371,6 +372,39 @@ namespace Confectionery.Controllers
 
             ViewBag.Categories = _context.Categories.ToList();
             return View(catalog);
+        }
+        // 🔥 GET: /Catalogs/Delete/10 - ПОКАЗЫВАЕТ форму подтверждения
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var catalog = await _context.Catalog
+                .Include(c => c.Category)
+                .FirstOrDefaultAsync(m => m.Id_Catalog == id);
+
+            if (catalog == null) return NotFound();
+
+            return View(catalog);
+        }
+
+        // 🔥 POST: /Catalogs/DeleteConfirmed/10 - УДАЛЯЕТ товар
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var catalog = await _context.Catalog.FindAsync(id);
+            if (catalog != null)
+            {
+                _context.Catalog.Remove(catalog);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "✅ Товар удален!";
+            }
+            else
+            {
+                TempData["Error"] = "❌ Товар не найден!";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
 

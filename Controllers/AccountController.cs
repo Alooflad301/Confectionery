@@ -85,7 +85,6 @@ namespace Confectionery.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            ModelState.Clear();
 
             if (string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
             {
@@ -96,34 +95,43 @@ namespace Confectionery.Controllers
             // ✅ ПРОВЕРКА СОВПАДЕНИЯ ПАРОЛЕЙ (уже в [Compare] атрибуте)
             if (!ModelState.IsValid)
             {
+                // Показываем ошибки паролей
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    ModelState.AddModelError("", error.ErrorMessage);
+                }
                 return View(model);
             }
 
+            // Дополнительные проверки БД
             if (await _context.Users.AnyAsync(u => u.Login == model.Login))
             {
-                ModelState.AddModelError("", "Пользователь с таким логином уже существует.");
+                ModelState.AddModelError("Login", "Логин уже занят!");
                 return View(model);
             }
 
-            if (await _context.Users.AnyAsync(u => u.Email == model.Email && !string.IsNullOrEmpty(model.Email)))
+            if (!string.IsNullOrEmpty(model.Email) &&
+                await _context.Users.AnyAsync(u => u.Email == model.Email))
             {
-                ModelState.AddModelError("", "Пользователь с таким email уже существует.");
+                ModelState.AddModelError("Email", "Email уже используется!");
                 return View(model);
             }
+
+            // ✅ ПАР ОЛИ НЕ СОВПАДАЮТ - уже проверено [Compare] выше!
 
             var user = new User
             {
                 Login = model.Login,
                 Name = model.Name ?? "",
-                Password = model.Password, // В продакшене → хеширование!
+                Password = model.Password, // ⚠️ В продакшене = BCrypt.Net!
                 Email = model.Email ?? "",
-                Id_Role = 1
+                Id_Role = 1 // Пользователь по умолчанию
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            // Автологин...
+            // Автологин
             var newUser = await _context.Users
                 .Include(u => u.Role)
                 .FirstAsync(u => u.Id_User == user.Id_User);
@@ -132,7 +140,7 @@ namespace Confectionery.Controllers
     {
         new Claim(ClaimTypes.NameIdentifier, newUser.Id_User.ToString()),
         new Claim(ClaimTypes.Name, newUser.Login),
-        new Claim(ClaimTypes.Role, "Пользователь")
+        new Claim(ClaimTypes.Role, newUser.Role?.Name ?? "Пользователь")
     };
 
             var claimsIdentity = new ClaimsIdentity(
@@ -142,7 +150,8 @@ namespace Confectionery.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity));
 
-            return RedirectToAction("Index", "Home");
+            TempData["Success"] = "✅ Регистрация успешна!";
+            return RedirectToAction("Index", "Catalogs");
         }
 
 
