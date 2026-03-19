@@ -1,45 +1,88 @@
 ﻿@model Confectionery.Models.Order
-
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = $"📦 Заказ #{Model.Id_Order}";
 }
 
-<h1>Delete</h1>
+<div class="order-details py-5 bg-gradient-cream">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- ЗАГОЛОВОК -->
+                <div class="text-center mb-5">
+                    <div class="order-badge mb-3 mx-auto">
+                        <span class="badge bg-@(Model.StatusOrder.Name == "Выполнен" ? "success" :
+                                                                   Model.StatusOrder.Name == "Отменен" ? "danger" : "warning") fs-5 px-4 py-3">
+                            <i class="fas fa-circle me-2"></i>@Model.StatusOrder.Name
+                        </span>
+                    </div>
+                    <h1 class="display-4 fw-bold text-primary mb-2">Заказ #@Model.Id_Order</h1>
+                    <p class="lead text-muted mb-0">
+                        от <strong>@Model.Date.ToString("dd.MM.yyyy HH:mm")</strong>
+                    </p>
+                </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Order</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StatusOrder)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StatusOrder.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Date)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Date)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id_Order" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+                <!-- КАРТОЧКА ЗАКАЗА -->
+                <div class="card shadow-xl border-0">
+                    <div class="card-body p-5">
+                        <div class="row g-5">
+                            <!-- Клиент -->
+                            <div class="col-md-6">
+                                <div class="info-card h-100">
+                                    <h5 class="text-primary mb-4">
+                                        <i class="fas fa-user me-2"></i>Клиент
+                                    </h5>
+                                    <div class="info-item">
+                                        <i class="fas fa-user-circle text-primary me-3"></i>
+                                        <div>
+                                            <div class="fw-bold h6 mb-1">@Model.User?.Name</div>
+                                            <small class="text-muted">@Model.User?.Login</small>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="fas fa-envelope text-info me-3"></i>
+                                        <div>@Model.User?.Email</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Детали заказа -->
+                            <div class="col-md-6">
+                                <div class="info-card h-100">
+                                    <h5 class="text-success mb-4">
+                                        <i class="fas fa-info-circle me-2"></i>Детали
+                                    </h5>
+                                    <div class="info-item">
+                                        <i class="fas fa-calendar text-warning me-3"></i>
+                                        <div>
+                                            <div class="fw-bold h6 mb-1">Дата заказа</div>
+                                            <small>@Model.Date.ToString("dd MMMM yyyy, HH:mm")</small>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="fas fa-ruble-sign text-success me-3 fs-5"></i>
+                                        <div>
+                                            <div class="display-6 fw-bold text-success">@Model.Price.ToString("C")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- КНОПКИ -->
+                    <div class="card-footer bg-light border-0 p-4">
+                        <div class="d-flex gap-3 justify-content-center">
+                            <a asp-action="Edit" asp-route-id="@Model.Id_Order"
+                               class="btn btn-warning btn-lg px-5 py-3 shadow-lg">
+                                <i class="fas fa-edit me-2"></i>Изменить статус
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 py-3 shadow-lg">
+                                <i class="fas fa-arrow-left me-2"></i>К списку
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

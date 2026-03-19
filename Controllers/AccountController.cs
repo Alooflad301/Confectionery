@@ -85,7 +85,6 @@ namespace Confectionery.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            // Очищаем предыдущие ошибки валидации
             ModelState.Clear();
 
             if (string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
@@ -94,41 +93,50 @@ namespace Confectionery.Controllers
                 return View(model);
             }
 
-            // Проверка на существующего пользователя
+            // ✅ ПРОВЕРКА СОВПАДЕНИЯ ПАРОЛЕЙ (уже в [Compare] атрибуте)
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
             if (await _context.Users.AnyAsync(u => u.Login == model.Login))
             {
                 ModelState.AddModelError("", "Пользователь с таким логином уже существует.");
                 return View(model);
             }
 
-            // Создаем нового пользователя с ролью "Пользователь" (Id_Role = 1)
+            if (await _context.Users.AnyAsync(u => u.Email == model.Email && !string.IsNullOrEmpty(model.Email)))
+            {
+                ModelState.AddModelError("", "Пользователь с таким email уже существует.");
+                return View(model);
+            }
+
             var user = new User
             {
                 Login = model.Login,
                 Name = model.Name ?? "",
-                Password = model.Password,
+                Password = model.Password, // В продакшене → хеширование!
                 Email = model.Email ?? "",
-                Id_Role = 1 // Роль "Пользователь" по умолчанию
+                Id_Role = 1
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            // Автоматическая авторизация после регистрации
+            // Автологин...
             var newUser = await _context.Users
                 .Include(u => u.Role)
                 .FirstAsync(u => u.Id_User == user.Id_User);
 
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, newUser.Id_User.ToString()),
-                new Claim(ClaimTypes.Name, newUser.Login),
-                new Claim(ClaimTypes.Role, "Пользователь")
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, newUser.Id_User.ToString()),
+        new Claim(ClaimTypes.Name, newUser.Login),
+        new Claim(ClaimTypes.Role, "Пользователь")
+    };
 
             var claimsIdentity = new ClaimsIdentity(
-                claims,
-                CookieAuthenticationDefaults.AuthenticationScheme);
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
@@ -136,6 +144,7 @@ namespace Confectionery.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()
@@ -237,12 +246,17 @@ namespace Confectionery.Controllers
         public string? Name { get; set; }
 
         [Required(ErrorMessage = "Пароль обязателен")]
-        [StringLength(50)]
+        [StringLength(50, MinimumLength = 6, ErrorMessage = "Пароль от 6 до 50 символов")]
         public string Password { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Подтвердите пароль")]
+        [Compare("Password", ErrorMessage = "Пароли не совпадают")]
+        public string ConfirmPassword { get; set; } = string.Empty;
 
         [EmailAddress]
         [StringLength(50)]
         public string? Email { get; set; }
     }
+
 
 }

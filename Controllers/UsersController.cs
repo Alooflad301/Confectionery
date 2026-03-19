@@ -70,7 +70,7 @@ namespace Confectionery.Controllers
             {
                 _context.Add(user);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index","Home");
+                return RedirectToAction("Index","Users");
             }
             ViewData["Id_Role"] = new SelectList(_context.Roles, "Id_Role", "Name", user.Id_Role);
             return View(user);
@@ -109,8 +109,28 @@ namespace Confectionery.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    // ✅ ИСПРАВЬ НА ЭТО:
+                    var existingUser = await _context.Users.FindAsync(id);
+                    if (existingUser == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Обновляем ТОЛЬКО измененные поля
+                    existingUser.Login = user.Login;
+                    existingUser.Name = user.Name;
+                    existingUser.Id_Role = user.Id_Role;
+                    existingUser.Email = user.Email;
+
+                    // Пароль обновляем ТОЛЬКО если заполнен
+                    if (!string.IsNullOrEmpty(user.Password?.Trim()))
+                    {
+                        existingUser.Password = user.Password;
+                    }
+
+                    _context.Update(existingUser);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -123,8 +143,8 @@ namespace Confectionery.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+
             ViewData["Id_Role"] = new SelectList(_context.Roles, "Id_Role", "Name", user.Id_Role);
             return View(user);
         }

@@ -5,6 +5,26 @@
     int totalPages = ViewBag.TotalPages as int? ?? 1;
 }
 
+@if (User.IsInRole("Администратор"))
+{
+    <div class="admin-actions mb-4">
+        <div class="row g-3 justify-content-between">
+            <div class="col-md-4">
+                <a asp-controller="Catalogs" asp-action="Create"
+                   class="btn btn-success btn-lg w-100 shadow-lg">
+                    <i class="fas fa-plus me-2"></i>Добавить товар
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a asp-controller="Categories" asp-action="Create"
+                   class="btn btn-info btn-lg w-100 shadow-lg">
+                    <i class="fas fa-folder-plus me-2"></i>Добавить категорию
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
 <div class="catalog-page">
     <!-- 🔍 Поиск -->
     <div class="catalog-header">
@@ -16,48 +36,76 @@
                        placeholder="Поиск по названию товара..."
                        value="@ViewBag.SearchString">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search">Поиск</i>
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- 🛠️ НОВЫЙ БЛОК ФИЛЬТРОВ -->
-    <div class="filters-panel">
-        <form asp-action="Index" method="get" class="filters-form">
-            <!-- Скрытые поля для сохранения поиска -->
-            <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+    <!-- 🛠️ ФИЛЬТРЫ -->
+    <div class="filters-panel mb-4">
+        <div class="row g-3">
+            <!-- Фильтры -->
+            <div class="col-md-8">
+                <form asp-action="Index" method="get" class="filters-form">
+                    <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+                    <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort" />
 
-            <div class="filter-group">
-                <label>🏷️ Категория:</label>
-                <select name="categoryId" class="form-select">
-                    <option value="">Все категории</option>
-                    @foreach (var cat in ViewBag.Categories as List<Confectionery.Models.Category>)
-                    {
-                        <option value="@cat.Id_Category"
-                                selected="@(ViewBag.CategoryId?.ToString() == cat.Id_Category.ToString())">
-                            @cat.Name (@cat.ProductsCount)
-                        </option>
-                    }
-                </select>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="filter-group">
+                                <label>🏷️ Категория:</label>
+                                <select name="categoryId" class="form-select">
+                                    <option value="">Все категории</option>
+                                    @foreach (var cat in ViewBag.Categories as List<Confectionery.Models.Category>)
+                                    {
+                                        <option value="@cat.Id_Category"
+                                                selected="@(ViewBag.CategoryId?.ToString() == cat.Id_Category.ToString())">
+                                            @cat.Name
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="filter-group price-filter">
+                                <label>💰 Цена:</label>
+                                <div class="price-inputs">
+                                    <input type="number" name="minPrice" class="form-control" value="@ViewBag.MinPrice" min="0">
+                                    <span>-</span>
+                                    <input type="number" name="maxPrice" class="form-control" value="@ViewBag.MaxPrice" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-filter"></i> Применить
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Очистить</a>
+                </form>
             </div>
 
-            <div class="filter-group price-filter">
-                <label>💰 Цена:</label>
-                <div class="price-inputs">
-                    <input type="number" name="minPrice" class="form-control"
-                           placeholder="от" value="@ViewBag.MinPrice" min="0" step="10">
-                    <span>-</span>
-                    <input type="number" name="maxPrice" class="form-control"
-                           placeholder="до" value="@ViewBag.MaxPrice" min="0" step="10">
-                </div>
+            <!-- 🔥 НОВАЯ СОРТИРОВКА -->
+            <div class="col-md-4">
+                <form id="sortForm" asp-action="Index" method="get">
+                    <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+                    <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
+                    <input type="hidden" name="minPrice" value="@ViewBag.MinPrice" />
+                    <input type="hidden" name="maxPrice" value="@ViewBag.MaxPrice" />
+                    <input type="hidden" name="page" value="@ViewBag.CurrentPage" />
+
+                    <label>🔄 Сортировать:</label>
+                    <select name="sortOrder" class="form-select" onchange="this.form.submit()">
+                        <option value="">По умолчанию</option>
+                        <option value="name_asc" selected="@(ViewBag.CurrentSort == "name_asc")">А→Я</option>
+                        <option value="name_desc" selected="@(ViewBag.CurrentSort == "name_desc")">Я→А</option>
+                        <option value="price_asc" selected="@(ViewBag.CurrentSort == "price_asc")">Дешевле→Дороже</option>
+                        <option value="price_desc" selected="@(ViewBag.CurrentSort == "price_desc")">Дороже→Дешевле</option>
+                    </select>
+                </form>
             </div>
 
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-filter"></i> Применить
-            </button>
-            <a asp-action="Index" class="btn btn-outline-secondary">Очистить</a>
-        </form>
+        </div>
     </div>
 
     @if (TempData["Success"] != null)
@@ -65,11 +113,11 @@
         <div class="alert alert-success">@TempData["Success"]</div>
     }
 
-    <!-- 💰 ЦЕНЫ В КАРТОЧКАХ ТОВАРОВ -->
+    <!-- 💰 ТОВАРЫ С АДМИН КНОПКАМИ -->
     <div class="products-grid">
         @foreach (var item in Model)
         {
-            <div class="product-card">
+            <div class="product-card position-relative">
                 <div class="product-image-container">
                     @if (item.HasPhoto)
                     {
@@ -85,7 +133,7 @@
                     <h3>@item.Product</h3>
                     <div class="category">@item.Category?.Name</div>
 
-                    <!-- ✅ НОВАЯ ЦЕНА В КАРТОЧКЕ -->
+                    <!-- ✅ ЦЕНА -->
                     <div class="price-tag">
                         <span class="current-price">@item.Price.ToString("C")</span>
                     </div>
@@ -101,7 +149,24 @@
                                 <i class="fas fa-cart-plus"></i> В корзину
                             </button>
                         </form>
+
                     </div>
+                    @if (User.IsInRole("Администратор"))
+                    {
+                        <div class="admin-actions mt-2 pt-2 border-top">
+                            <a asp-controller="Catalogs" asp-action="Edit" asp-route-id="@item.Id_Catalog"
+                               class="btn btn-outline-warning btn-sm me-1">
+                                <i class="fas fa-edit me-1"></i>Редактировать
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@item.Id_Catalog" method="post"
+                                  class="d-inline delete-form"
+                                  onsubmit="return confirm('Удалить @item.Product?')">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash me-1"></i>Удалить
+                                </button>
+                            </form>
+                        </div>
+                    }
                 </div>
             </div>
         }
@@ -115,14 +180,30 @@
                 @for (int i = 1; i <= totalPages; i++)
                 {
                     <li class="page-item @(i == currentPage ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@i"
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@i"
                            asp-route-searchString="@ViewBag.SearchString"
                            asp-route-categoryId="@ViewBag.CategoryId"
                            asp-route-minPrice="@ViewBag.MinPrice"
-                           asp-route-maxPrice="@ViewBag.MaxPrice">@i</a>
+                           asp-route-maxPrice="@ViewBag.MaxPrice"
+                           asp-route-sortOrder="@ViewBag.CurrentSort">@i</a>
                     </li>
                 }
             </ul>
         </nav>
     }
 </div>
+
+<style>
+    .admin-actions {
+        font-size: 0.85em;
+    }
+
+        .admin-actions .btn {
+            transition: all 0.3s ease;
+        }
+
+            .admin-actions .btn:hover {
+                transform: scale(1.05);
+            }
+</style>

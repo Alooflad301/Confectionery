@@ -1,49 +1,81 @@
 ﻿@model Confectionery.Models.Order
-
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = Model?.Id_Order != null ? $"✏️ Изменить статус заказа #{Model.Id_Order}" : "Редактирование";
 }
 
-<h1>Edit</h1>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
-<h4>Order</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id_Order" />
-            <div class="form-group">
-                <label asp-for="Id_User" class="control-label"></label>
-                <select asp-for="Id_User" class="form-control" asp-items="ViewBag.Id_User"></select>
-                <span asp-validation-for="Id_User" class="text-danger"></span>
+<div class="edit-order-status py-5 bg-gradient-blue">
+    <div class="container">
+        @if (Model == null)
+        {
+            <div class="alert alert-danger text-center py-5">
+                <h2>❌ Заказ не найден</h2>
+                <a asp-action="Index" class="btn btn-primary btn-lg">← К списку</a>
             </div>
-            <div class="form-group">
-                <label asp-for="Id_StatusOrder" class="control-label"></label>
-                <select asp-for="Id_StatusOrder" class="form-control" asp-items="ViewBag.Id_StatusOrder"></select>
-                <span asp-validation-for="Id_StatusOrder" class="text-danger"></span>
+        }
+        else
+        {
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center mb-5">
+                        <h1 class="display-5 fw-bold text-primary mb-3">
+                            <i class="fas fa-edit me-3"></i>Изменить статус заказа #@Model.Id_Order
+                        </h1>
+                        <p class="lead text-muted">от @Model.Date.ToString("dd.MM.yyyy HH:mm")</p>
+                    </div>
+
+                    <div class="card shadow-xl border-0">
+                        <div class="card-header bg-primary text-white py-4">
+                            <h3 class="mb-0"><i class="fas fa-cog me-2"></i>Новый статус</h3>
+                        </div>
+                        
+                        <form asp-action="Edit" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id_Order" />
+                            
+                            <div class="card-body py-5">
+                                <div class="alert alert-info mb-4">
+                                    <strong>Текущий статус:</strong> <span class="badge bg-info">@Model.StatusOrder.Name</span>
+                                </div>
+
+                                <!-- ✅ ПРОСТОЙ SELECT name="Id_StatusOrder" -->
+                                <div class="form-floating">
+                                    <select name="Id_StatusOrder" class="form-select form-select-lg" required>
+                                        <option value="1">📥 Новый</option>
+                                        <option value="2" selected>✅ Подтвержден</option>
+                                        <option value="3">👨‍🍳 Готовится</option>
+                                        <option value="4">🚚 В доставке</option>
+                                        <option value="5">🎉 Выполнен</option>
+                                        <option value="6">❌ Отменен</option>
+                                    </select>
+
+
+                                    <label>Выберите новый статус</label>
+                                </div>
+                            </div>
+
+                            <div class="card-footer bg-light border-0 p-4">
+                                <div class="d-flex gap-3 justify-content-center">
+                                    <button type="submit" class="btn btn-success btn-lg px-5 py-3">
+                                        <i class="fas fa-save me-2"></i>Сохранить
+                                    </button>
+                                    <a asp-action="Details" asp-route-id="@Model.Id_Order" 
+                                       class="btn btn-outline-secondary btn-lg px-5 py-3">
+                                        <i class="fas fa-times me-2"></i>Отмена
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        }
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

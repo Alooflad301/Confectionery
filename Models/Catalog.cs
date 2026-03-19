@@ -19,6 +19,12 @@ namespace Confectionery.Models
         // Фото товара
         public byte[]? Photo { get; set; }
 
+        public string? PhotoPath { get; set; }
+
+        public string? PhotoUrl => !string.IsNullOrEmpty(PhotoPath)
+        ? $"~/images/{PhotoPath}"
+        : "~/images/no-image.png";
+
         [StringLength(20)]
         public string? PhotoContentType { get; set; } // image/jpeg, image/png
 

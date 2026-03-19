@@ -17,54 +17,79 @@ namespace Confectionery.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string? searchString, int? categoryId,
-    decimal? minPrice, decimal? maxPrice, int page = 1)
+        public async Task<IActionResult> Index(string searchString, string sortOrder,
+    int? categoryId, decimal? minPrice, decimal? maxPrice, int? page)
         {
-            int pageSize = 12;
-            var query = _context.Catalog
-                .Include(c => c.Category)
-                .AsQueryable();
+            // 🔥 СОРТИРОВКА
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_asc" : "";
+            ViewBag.PriceSortParm = sortOrder == "price_asc" ? "price_desc" : "price_asc";
 
-            // 🔍 Поиск по названию
+            // Базовый запрос
+            var catalogs = _context.Catalog.Include(c => c.Category).AsQueryable();
+
+            // Поиск
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(c => c.Product.Contains(searchString));
+                catalogs = catalogs.Where(c => c.Product.Contains(searchString));
                 ViewBag.SearchString = searchString;
             }
 
-            // 🏷️ Фильтр по категории
+            // Категория
             if (categoryId.HasValue)
             {
-                query = query.Where(c => c.Id_Ctegory == categoryId.Value);
+                catalogs = catalogs.Where(c => c.Id_Ctegory == categoryId);
                 ViewBag.CategoryId = categoryId;
             }
 
-            // 💰 Фильтр по цене
-            if (minPrice.HasValue && minPrice > 0)
+            // Цена
+            if (minPrice.HasValue)
             {
-                query = query.Where(c => c.Price >= minPrice.Value);
+                catalogs = catalogs.Where(c => c.Price >= minPrice.Value);
                 ViewBag.MinPrice = minPrice;
             }
-            if (maxPrice.HasValue && maxPrice > 0)
+            if (maxPrice.HasValue)
             {
-                query = query.Where(c => c.Price <= maxPrice.Value);
+                catalogs = catalogs.Where(c => c.Price <= maxPrice.Value);
                 ViewBag.MaxPrice = maxPrice;
             }
 
-            var totalItems = await query.CountAsync();
-            var catalogs = await query
-                .OrderBy(c => c.Product)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            // 🔥 СОРТИРОВКА
+            switch (sortOrder)
+            {
+                case "name_asc":
+                    catalogs = catalogs.OrderBy(c => c.Product);
+                    break;
+                case "name_desc":
+                    catalogs = catalogs.OrderByDescending(c => c.Product);
+                    break;
+                case "price_asc":
+                    catalogs = catalogs.OrderBy(c => c.Price);
+                    break;
+                case "price_desc":
+                    catalogs = catalogs.OrderByDescending(c => c.Price);
+                    break;
+                default:
+                    catalogs = catalogs.OrderBy(c => c.Id_Catalog);
+                    break;
+            }
 
-            // 📋 Все категории для дропдауна
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            ViewBag.CurrentPage = page;
+            // Пагинация
+            int pageSize = 12;
+            ViewBag.CurrentPage = page ?? 1;
+            var totalItems = await catalogs.CountAsync();
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            return View(catalogs);
+            int currentPage = page ?? 1;
+            catalogs = catalogs.Skip((currentPage - 1) * pageSize).Take(pageSize);
+
+
+            var model = await catalogs.ToListAsync();
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+
+            return View(model);
         }
+
 
 
         public async Task<IActionResult> Details(int id)
@@ -260,6 +285,99 @@ namespace Confectionery.Controllers
             TempData["Success"] = $"Заказ #{order.Id_Order} успешно создан!";
             return RedirectToAction("Basket");
         }
+        // GET: Catalogs/Edit/5
+        // GET
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var catalog = await _context.Catalog.FindAsync(id);
+            if (catalog == null) return NotFound();
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            return View(catalog);
+        }
+
+        // POST
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, Catalog catalog)
+        {
+            ModelState.Remove("OrderCatalogs");
+
+            if (ModelState.IsValid)
+            {
+                var existing = await _context.Catalog.FindAsync(id);
+                if (existing == null) return NotFound();
+
+                existing.Product = catalog.Product;
+                existing.Id_Ctegory = catalog.Id_Ctegory;
+                existing.Description = catalog.Description;
+                existing.Price = catalog.Price;
+                existing.PhotoPath = catalog.PhotoPath;
+
+                // Загружаем новую картинку если путь указан
+                if (!string.IsNullOrEmpty(catalog.PhotoPath))
+                {
+                    var imagePath = Path.Combine("wwwroot/images", catalog.PhotoPath);
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        existing.Photo = await System.IO.File.ReadAllBytesAsync(imagePath);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "✅ Обновлено!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.Categories = _context.Categories.ToList();
+            return View(catalog);
+        }
+
+
+        // GET: Catalogs/Create
+        // GET: Catalogs/Create
+        // GET: Catalogs/Create
+        public IActionResult Create()
+        {
+            ViewBag.Categories = _context.Categories.ToList();
+            return View();
+        }
+
+        // POST: Catalogs/Create
+        [HttpPost]
+        public async Task<IActionResult> Create(Catalog catalog)
+        {
+            ModelState.Remove("OrderCatalogs");
+
+            if (ModelState.IsValid)
+            {
+                // Загружаем картинку если путь указан
+                if (!string.IsNullOrEmpty(catalog.PhotoPath))
+                {
+                    var imagePath = Path.Combine("wwwroot/images", catalog.PhotoPath);
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        catalog.Photo = await System.IO.File.ReadAllBytesAsync(imagePath);
+                    }
+                }
+
+                _context.Add(catalog);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "✅ Добавлено!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.Categories = _context.Categories.ToList();
+            return View(catalog);
+        }
+
+
+
+
+
+
 
 
 
