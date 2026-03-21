@@ -83,27 +83,26 @@ namespace Confectionery.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]  // ✅ Добавь для защиты
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            // ✅ Очищаем старые ошибки
+            ModelState.Clear();
 
+            // Простая проверка обязательных полей
             if (string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
             {
-                ModelState.AddModelError("", "Заполните обязательные поля.");
+                ModelState.AddModelError("", "Заполните логин и пароль");
                 return View(model);
             }
 
-            // ✅ ПРОВЕРКА СОВПАДЕНИЯ ПАРОЛЕЙ (уже в [Compare] атрибуте)
+            // ✅ Атрибуты [Compare], [Required] уже проверили пароли
             if (!ModelState.IsValid)
             {
-                // Показываем ошибки паролей
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    ModelState.AddModelError("", error.ErrorMessage);
-                }
-                return View(model);
+                return View(model);  // ✅ Показываем ВСЕ ошибки под полями
             }
 
-            // Дополнительные проверки БД
+            // Проверки БД (уникальность)
             if (await _context.Users.AnyAsync(u => u.Login == model.Login))
             {
                 ModelState.AddModelError("Login", "Логин уже занят!");
@@ -117,15 +116,14 @@ namespace Confectionery.Controllers
                 return View(model);
             }
 
-            // ✅ ПАР ОЛИ НЕ СОВПАДАЮТ - уже проверено [Compare] выше!
-
+            // ✅ Создаем пользователя
             var user = new User
             {
                 Login = model.Login,
                 Name = model.Name ?? "",
-                Password = model.Password, // ⚠️ В продакшене = BCrypt.Net!
+                Password = model.Password,  // 🎉 Без хеширования
                 Email = model.Email ?? "",
-                Id_Role = 1 // Пользователь по умолчанию
+                Id_Role = 1  // Пользователь (было 1)
             };
 
             _context.Users.Add(user);
@@ -143,16 +141,13 @@ namespace Confectionery.Controllers
         new Claim(ClaimTypes.Role, newUser.Role?.Name ?? "Пользователь")
     };
 
-            var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity));
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
             TempData["Success"] = "✅ Регистрация успешна!";
             return RedirectToAction("Index", "Catalogs");
         }
+
 
 
         [HttpPost]
@@ -247,24 +242,51 @@ namespace Confectionery.Controllers
     // ViewModel для формы регистрации
     public class RegisterViewModel
     {
-        [Required(ErrorMessage = "Логин обязателен")]
-        [StringLength(50)]
+        // 🔥 СООБЩЕНИЯ ОШИБОК (статические константы)
+        public static class ValidationMessages
+        {
+            public const string Required = "Поле обязательно для заполнения";
+            public const string InvalidLogin = "Логин: латинские буквы, цифры, ._- (3-50 символов)";
+            public const string InvalidName = "Имя: только буквы и пробелы (2-50 символов)";
+            public const string InvalidPassword = "Пароль: 6-16 символов без пробелов";
+            public const string InvalidEmail = "Введите корректный email";
+            public const string PasswordsDoNotMatch = "Пароли не совпадают";
+            public const string LoginExists = "Логин уже используется";
+            public const string EmailExists = "Email уже зарегистрирован";
+        }
+
+        // 🔥 ПАТТЕРНЫ (статические константы)
+        public static class ValidationPatterns
+        {
+            public const string LoginPattern = @"^[a-zA-Z0-9._-]+$";
+            public const string NamePattern = @"^[а-яА-ЯёЁa-zA-Z\s]+$";
+            public const string PasswordPattern = @"^(?=.{6,16}$)[^\s]+$";
+        }
+
+        // 🔥 ПОЛЯ МОДЕЛИ с валидацией
+        [Required(ErrorMessage = ValidationMessages.Required)]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = ValidationMessages.InvalidLogin)]
+        [RegularExpression(ValidationPatterns.LoginPattern, ErrorMessage = ValidationMessages.InvalidLogin)]
         public string Login { get; set; } = string.Empty;
 
-        [StringLength(50)]
-        public string? Name { get; set; }
+        [Required(ErrorMessage = ValidationMessages.Required)]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = ValidationMessages.InvalidName)]
+        [RegularExpression(ValidationPatterns.NamePattern, ErrorMessage = ValidationMessages.InvalidName)]
+        public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Пароль обязателен")]
-        [StringLength(50, MinimumLength = 6, ErrorMessage = "Пароль от 6 до 50 символов")]
+        [Required(ErrorMessage = ValidationMessages.Required)]
+        [EmailAddress(ErrorMessage = ValidationMessages.InvalidEmail)]
+        [StringLength(100)]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = ValidationMessages.Required)]
+        [StringLength(16, MinimumLength = 6, ErrorMessage = ValidationMessages.InvalidPassword)]
+        [RegularExpression(ValidationPatterns.PasswordPattern, ErrorMessage = ValidationMessages.InvalidPassword)]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Подтвердите пароль")]
-        [Compare("Password", ErrorMessage = "Пароли не совпадают")]
+        [Required(ErrorMessage = ValidationMessages.Required)]
+        [Compare(nameof(Password), ErrorMessage = ValidationMessages.PasswordsDoNotMatch)]
         public string ConfirmPassword { get; set; } = string.Empty;
-
-        [EmailAddress]
-        [StringLength(50)]
-        public string? Email { get; set; }
     }
 
 

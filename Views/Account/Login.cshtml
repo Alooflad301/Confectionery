@@ -25,13 +25,13 @@
 
         <form asp-action="Login" method="post">
             <div>
-                <label asp-for="Login"></label>
+                <label asp-for="Login">Логин</label>
                 <input asp-for="Login" class="form-control" />
                 <span asp-validation-for="Login" class="text-danger"></span>
             </div>
 
             <div>
-                <label asp-for="Password"></label>
+                <label asp-for="Password">Пароль</label>
                 <input asp-for="Password" type="password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
